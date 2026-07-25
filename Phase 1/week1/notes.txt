@@ -1,0 +1,26 @@
+variables:
+
+char* person1 = "Aaron";
+char* person2 = "Danny";
+
+int p1atk = 50;
+int p2atk = 55;
+int p1def = 35;
+int p2def = 30;
+
+
+
+functions:
+
+int roll_base_damage(int attack, int defense) 
+-returns attack minus defense
+
+float element_multiplier(int atk_element int def_element)
+
+int apply_variance(int damage)
+
+int is_critical(int crit_chance_percent)
+
+void print_hit(const char *attacker, const char *defender, int 
+damage, int was_crit)
+

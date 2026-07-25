@@ -1,0 +1,18 @@
+# Build artifacts
+*.o
+*.obj
+*.out
+*.a
+*.so
+*.dylib
+*.dSYM/
+
+# Compiled executables (e.g. week1/main, produced by `make`)
+main
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*~
