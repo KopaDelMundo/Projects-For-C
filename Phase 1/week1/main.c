@@ -1,19 +1,27 @@
+//current status//
+//implemented functions working, need to implement element multiplier and print hit
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-//current status//
-//
+#define earth 1
+#define air 2
+#define water 3
+#define fire 4
 
 
 int roll_base_damage(int attack, int defense);
 int apply_variance(int damgage);
 int is_critical(int crit_chance_percent);
+float elemental_multiplier(int atk_element, int def_element);
+void assign_element();
 
 int main()
 {
     srand(time(NULL));
 
+    
     //names
     //char* person1 = "Aaron";
     //char* person2 = "Danny";
@@ -24,6 +32,7 @@ int main()
     //stats//
     //attack
     int p1atk = 550;
+
     //int p2atk = 105;
     //defense
     //int p1def = 65;
@@ -41,11 +50,7 @@ int main()
         }
         printf("attack is %d \n",var_damage);
         printf("/////------//////");
-    }
-    
-
-
-    
+    } 
 
 }
 
@@ -106,4 +111,22 @@ int is_critical(int crit_chance_percent)
     }
 
     return crit;
+}
+
+int assign_element(char* person,int element_stat)
+{
+    
+}
+
+float elemental_multiplier(int atk_element, int def_element)
+{
+    char* element[] = {"earth","air","water","fire"};
+    int atk_el = (rand() % 4) + 1;
+    int def_el = (rand() % 4) + 1;
+
+    if
+
+
+
+    
 }

@@ -24,3 +24,22 @@ int is_critical(int crit_chance_percent)
 void print_hit(const char *attacker, const char *defender, int 
 damage, int was_crit)
 
+---
+
+for element_multiplier, I need to come up with an elemnent system
+
+element weakness chart 
+
+earth<------fire
+ |            ^
+ |            |
+ V            |
+air ------> water
+
+
+hero and villan will randomly be assigned attack element and defense element. 
+
+The winninng element gets 1.5 multipler 
+losing/resisting element gets a 20% damage reduction
+all other combos do nothing
+
