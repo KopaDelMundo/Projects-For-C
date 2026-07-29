@@ -1,16 +1,10 @@
 //current status//
-//All functions implemented, now to work everything into gameloop that stops after 5 turns
-//need to determin how to make turns for player/enemyß
+//All functions implemented, now to work everything into gameloop that stops after 5 turns or 0 hp
+//completing the turn taking for damage
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#define earth 1
-#define air 2
-#define water 3
-#define fire 4
-
 
 int roll_base_damage(int attack, int defense);
 int apply_variance(int damgage);
@@ -34,31 +28,53 @@ int main()
         
     //attack//
     int p1atk = 550;
-    int p2atk = 105;
+    int p2atk = 505;
     
     //defense
     int p1def = 350;
-    int p2def = 330;
+    int p2def = 320;
     //crit_chance
     int p1crit = 10;
     int p2crit = 15;
 
-    int playerCount = 2;
-    int turns[] = {1,2};
-    int currentPlayer = 1;
+    int heroStats[]    = {p1hp, p1atk, p1def, p1crit};
+    int villainStats[] = {p2hp, p1atk, p2def, p2crit};
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 1; i < 6; i++)
     {
 
+        int base_dmg;
+        int var_damage;
+        float element_dmg;
+        int attacker_crit;
+        int defender_hp;
 
-        int base_dmg = roll_base_damage(p1atk, p2def);
-        int var_damage = apply_variance(base_dmg);
-        float element_dmg = elemental_multiplier();
-        if (is_critical(p1crit))
+        if (p1hp <= 0 || p2hp <= 0)
+        {
+            break;
+        }
+
+        if (i % 2 != 0)
+        {
+            base_dmg = roll_base_damage(p1atk, p2def);
+            attacker_crit = p1crit;
+            defender_hp = p2hp;
+        }
+        else
+        {
+            base_dmg = roll_base_damage(p2atk, p1def);
+            attacker_crit = p2crit;
+            defender_hp = p1hp;
+        }
+                   
+        var_damage = apply_variance(base_dmg);
+        element_dmg = elemental_multiplier();
+
+        if (is_critical(attacker_crit))
         {
             var_damage = var_damage * 2;
         }
-        
+            
         if (element_dmg == 2.0)
         {
             var_damage = var_damage + 100;
@@ -70,9 +86,12 @@ int main()
             printf("Elemental disadvantage! Damage reduced.\n");
         }
 
-        if(var_damage)
+        if(var_damage <= 0) var_damage = 1;
+
         printf("attack is %d \n",var_damage);
         printf("/////------//////");
+        
+        
     } 
 
 }
@@ -98,7 +117,7 @@ int apply_variance(int damage)
     printf("Percent modifier is %d\n", percent);
     
     float percent_of_damage = (damage * percent) / 100;
-    printf("%d percent of %i is %f\n", percent, damage, percent_of_damage);
+    //printf("%d percent of %i is %f\n", percent, damage, percent_of_damage);
 
     int flip_num = rand() % 100;
 
