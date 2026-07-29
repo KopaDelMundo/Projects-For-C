@@ -1,5 +1,6 @@
 //current status//
-//implemented functions working, need to implement element multiplier and print hit
+//All functions implemented, now to work everything into gameloop that stops after 5 turns
+//need to determin how to make turns for player/enemyß
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +15,7 @@
 int roll_base_damage(int attack, int defense);
 int apply_variance(int damgage);
 int is_critical(int crit_chance_percent);
-float elemental_multiplier(int atk_element, int def_element);
+float elemental_multiplier();
 void assign_element();
 
 int main()
@@ -22,32 +23,54 @@ int main()
     srand(time(NULL));
 
     
-    //names
-    //char* person1 = "Aaron";
-    //char* person2 = "Danny";
+      ////names////
+    char* person1 = "Hero";
+    char* person2 = "Villian";
 
+      ////stats////
     //health
-    //int p1hp = 700;
-    //int p2hp = 700;
-    //stats//
-    //attack
+    int p1hp = 2000;
+    int p2hp = 2000;
+        
+    //attack//
     int p1atk = 550;
-
-    //int p2atk = 105;
+    int p2atk = 105;
+    
     //defense
-    //int p1def = 65;
-    int p2def = 336;
+    int p1def = 350;
+    int p2def = 330;
     //crit_chance
     int p1crit = 10;
+    int p2crit = 15;
+
+    int playerCount = 2;
+    int turns[] = {1,2};
+    int currentPlayer = 1;
 
     for (int i = 0; i < 5; i++)
     {
+
+
         int base_dmg = roll_base_damage(p1atk, p2def);
         int var_damage = apply_variance(base_dmg);
+        float element_dmg = elemental_multiplier();
         if (is_critical(p1crit))
         {
             var_damage = var_damage * 2;
         }
+        
+        if (element_dmg == 2.0)
+        {
+            var_damage = var_damage + 100;
+            printf("Elemental advantage! Damage increased.\n");
+        }
+        else if (element_dmg == 0.5)
+        {
+            var_damage =var_damage -100;
+            printf("Elemental disadvantage! Damage reduced.\n");
+        }
+
+        if(var_damage)
         printf("attack is %d \n",var_damage);
         printf("/////------//////");
     } 
@@ -113,20 +136,16 @@ int is_critical(int crit_chance_percent)
     return crit;
 }
 
-int assign_element(char* person,int element_stat)
+float elemental_multiplier()
 {
-    
-}
-
-float elemental_multiplier(int atk_element, int def_element)
-{
-    char* element[] = {"earth","air","water","fire"};
+    float didItHit = 1.0;
+    //char* element[] = {"earth","air","water","fire"};
     int atk_el = (rand() % 4) + 1;
     int def_el = (rand() % 4) + 1;
 
-    if
+    if ((atk_el % 4) +1 == def_el) didItHit = 2.0;
+    else if ((def_el % 4) + 1 == atk_el) didItHit = 0.5;
 
-
-
+    return didItHit;
     
 }
