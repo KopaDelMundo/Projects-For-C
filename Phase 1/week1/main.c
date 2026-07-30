@@ -1,7 +1,3 @@
-//current status//
-//All functions implemented, now to work everything into gameloop that stops after 5 turns or 0 hp
-//completing the turn taking for damage
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -121,11 +117,7 @@ int main()
         }
         
     } 
-
-
-
     printf("-------------------------------------------\n");
-
 }
 
 int roll_base_damage(int attack, int defense)
