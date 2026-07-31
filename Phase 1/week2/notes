@@ -1,0 +1,7 @@
+functions:
+
+int read_menu_choice(void)
+void player_turn(...)
+void enemy_turn(...)
+int is_battle_over(int hero_hp, int enemy_hp)
+void print_status(...)
