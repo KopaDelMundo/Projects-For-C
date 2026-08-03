@@ -9,8 +9,10 @@
     int hero_stats[]  = {700, 550, 350, 10};
     int enemy_stats[] = {500, 505, 320, 15};
 
-void print_status(int hero_hp, int enemy_hp);
-int is_battle_over(int hero_hp, int enemy_hp);
+    int item = 3;
+
+void print_status(void);
+int is_battle_over(void);
 int read_menu_choice(void);
 void player_turn(int choice);
 void enemy_turn(void);
@@ -18,7 +20,7 @@ void enemy_turn(void);
 int roll_base_damage(int attack, int defense);
 int apply_variance(int damgage);
 int is_critical(int crit_chance_percent);
-float elemental_multiplier();
+float elemental_multiplier(void);
 //-----------//
 int calculate_attack(int attacker[], int defender[]);
 
@@ -28,21 +30,21 @@ int main(void)
     srand(time(NULL));
 
     ////names////
-    char* hero = "Hero";
-    char* enemy = "Villian";
+    //char* hero = "Hero";
+    //char* enemy = "Villian";
 
 
 
     int choice = 0;
-    int turn = 0;
+    //int turn = 0;
 
-    while(!is_battle_over(hero_stats[0], enemy_stats[0]))
+    while(!is_battle_over())
     {
 
 
-        int option = 0;
+        //int option = 0;
 
-        print_status(hero_stats[0], enemy_stats[0]);
+        print_status();
 
         //Hero's Turn
         choice = read_menu_choice();
@@ -55,7 +57,7 @@ int main(void)
 
     }
     
-    print_status(hero_stats[0], enemy_stats[0]);
+    print_status();
 
     if(enemy_stats[0] <= 0)
     {
@@ -68,15 +70,15 @@ int main(void)
     
 }
 
-void print_status(int hero_hp, int enemy_hp)
+void print_status(void)
 {
-    printf("--- HERO: %d HP | Slime: %d HP ---\n", hero_hp, enemy_hp);
+    printf("--- HERO: %d HP | Slime: %d HP ---\n", hero_stats[0], enemy_stats[0]);
 }
 
-int is_battle_over(int hero_hp, int enemy_hp)
+int is_battle_over(void)
 {
     int status = 0;
-    if (hero_hp <= 0 || enemy_hp <= 0) status = 1;
+    if (hero_stats[0] <= 0 || enemy_stats[0] <= 0) status = 1;
     return status;
 }
 
@@ -117,7 +119,17 @@ void player_turn(int choice)
             printf("Hero defends!\n");
             break;
         case 3:
-            printf("Hero uses an item!\n");
+            if (item < 0)
+            {
+                printf("Hero uses an item to heal!\n");
+                hero_stats[0] += 100;
+            }
+            else if (item <= 0)
+            {
+                printf("Hero tried to use an item but doesn't have any more!\n");
+                item = 0;
+            }
+            
             break;
         default:
             printf("Well something broke...\n");
@@ -216,7 +228,7 @@ int is_critical(int crit_chance_percent)
     return crit;
 }
 
-float elemental_multiplier()
+float elemental_multiplier(void)
 {
     float didItHit = 1.0;
     int atk_el = (rand() % 4) + 1;
