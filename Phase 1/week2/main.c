@@ -1,27 +1,25 @@
-
-//TODO: complete damage and add defend/item mechanics
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-    ////stats////       HP | ATK | DEF | CRIT      
-    int hero_stats[]  = {700, 550, 350, 10};
-    int enemy_stats[] = {500, 505, 320, 15};
+////stats////       HP | ATK | DEF | CRIT      
+int hero_stats[]  = {1000, 650, 350, 10};
+int enemy_stats[] = {1000, 500, 300, 10};
 
-    int item = 3;
+//item count and defend flag
+int item = 3;
+int defend = 0;
 
+//function prototypes
 void print_status(void);
 int is_battle_over(void);
 int read_menu_choice(void);
 void player_turn(int choice);
 void enemy_turn(void);
-//------------//
 int roll_base_damage(int attack, int defense);
 int apply_variance(int damgage);
 int is_critical(int crit_chance_percent);
 float elemental_multiplier(void);
-//-----------//
 int calculate_attack(int attacker[], int defender[]);
 
 
@@ -29,21 +27,10 @@ int main(void)
 {
     srand(time(NULL));
 
-    ////names////
-    //char* hero = "Hero";
-    //char* enemy = "Villian";
-
-
-
     int choice = 0;
-    //int turn = 0;
 
     while(!is_battle_over())
     {
-
-
-        //int option = 0;
-
         print_status();
 
         //Hero's Turn
@@ -51,21 +38,18 @@ int main(void)
         player_turn(choice);
 
         //Enemy's Turn
-
-
-        
-
+        enemy_turn();
     }
     
     print_status();
 
     if(enemy_stats[0] <= 0)
     {
-        printf("The enemy won!");
+        printf("The Hero won!");
     }
     else
     {
-        printf("The Hero won!");
+        printf("The Enemy won!");
     }
     
 }
@@ -116,13 +100,15 @@ void player_turn(int choice)
 
             break;
         case 2:
+            defend = 1;
             printf("Hero defends!\n");
             break;
         case 3:
-            if (item < 0)
+            if (item > 0)
             {
                 printf("Hero uses an item to heal!\n");
-                hero_stats[0] += 100;
+                hero_stats[0] += 300;
+                item -= 1;
             }
             else if (item <= 0)
             {
@@ -140,16 +126,19 @@ void player_turn(int choice)
 void enemy_turn(void)
 {
     int dmg = calculate_attack(enemy_stats, hero_stats);
+    if(defend == 1)
+    {
+        dmg /= 2;
+        defend = 0;
+    }
     hero_stats[0] -= dmg;
     printf("The enemy attacks for %d!\n", dmg);
 }
 
-///------------------------------------------//
-
 int calculate_attack(int attacker[], int defender[])
 {
-    int base_dmg = roll_base_damage(attacker[0],defender[0]);
-    int attacker_crit = attacker[3];
+    int base_dmg = roll_base_damage(attacker[1],defender[2]);
+    int attacker_crit = is_critical(attacker[3]);
     int var_dmg = apply_variance(base_dmg);
     float element_dmg = elemental_multiplier();
 
@@ -162,6 +151,11 @@ int calculate_attack(int attacker[], int defender[])
     {
         var_dmg /= 2;
         //printf("Elemental disadvantage! Damage reduced.\n");
+    }
+    
+    if (attacker_crit == 1)
+    {
+        var_dmg *= 2;
     }
 
     if (var_dmg <= 0) var_dmg = 1;
@@ -230,10 +224,17 @@ int is_critical(int crit_chance_percent)
 
 float elemental_multiplier(void)
 {
+
+    //randomly assigns an int between 1-4, meant to represent
+    //earth, air, water and fire respectively.
+    //earth beats air, air beats water, water beats fire, and fire beats earth
     float didItHit = 1.0;
     int atk_el = (rand() % 4) + 1;
     int def_el = (rand() % 4) + 1;
 
+    //if the attacker gets an element that beats the defender's, attack is doubled
+    //if the defender gets an element that beats attackers, the attack is halved
+    //nothing happens otherwise
     if ((atk_el % 4) +1 == def_el) didItHit = 2.0;
     else if ((def_el % 4) + 1 == atk_el) didItHit = 0.5;
 
