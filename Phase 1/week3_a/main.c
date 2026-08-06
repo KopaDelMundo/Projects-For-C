@@ -14,7 +14,7 @@ int main(void)
 
     do
     {
-        /* code */
+        inv_list(inventory, 10);
     } while (input != "q" || input != "Q" );
     
     
