@@ -1,0 +1,5 @@
+functions
+
+int inv_add(char names[][32], int *count, const char *name); //appends(adds) if room
+int inv_remove(char names[][32], int *count, int index); //removes at index by shifting later items down
+void inv_remove(char name[][32], int count); //prints item list
