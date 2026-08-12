@@ -53,6 +53,13 @@ void inv_add(char names[][32], int *count, const char *name)
 
 void inv_remove(char names[][32], int *count, int index)
 {
-    int dif =  
-    for(int i = 0; i )
+    for (int i = index; i < count - 1; i++)
+    {
+        if(i != count -1)
+        {
+            names[i][31] = names[i+1][31];
+        }
+
+        count -= 1;
+    }
 }
