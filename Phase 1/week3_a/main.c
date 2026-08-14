@@ -7,8 +7,7 @@ void inv_add(char names[][32], int *count, const char *name); //appends(adds) if
 void inv_remove(char names[][32], int *count, int index); //removes at index by shifting later items down
 void inv_list(char names[][32], int count); //prints item list
 int read_menu_choice(void);
-void handle_input(int choice);
-char* handle_string(void);
+
 
 int main(void)
 {
@@ -19,36 +18,42 @@ int main(void)
     };
     
     int choice = 0;
-    
+    char item[32];
 
     do
     {
         inv_list(inventory, count);
         choice = read_menu_choice();
-        void handle_input(choice);
+        switch(choice)
+        {
+            case 1:
+                printf("Enter item name (32 character limit): \n");
+                fgets(item,32,stdin);
+                inv_add(inventory, &count, item);
+                break;
+            case 2:
+                    do
+                    {
+                        printf("Select the index of an item to remove: \n");
+                        int rmIndex = 11;
+                        int input = scanf("%i", &rmIndex);
+
+                        if(input != 1)
+                        {
+                            int c;
+                            while ((c = getchar()) != '\n' && c != EOF){ }
+                            choice = 11;
+                        }
+                    
+
+                    } while (choice < 0 || choice > count);
+        }
 
     } while (choice != 3);
     
 
 }
 
-char* handle_string(void)
-{
-    char item[32] = "";
-    int input = scanf("%s", item);
-    
-    return item;
-}
-
-void handle_input(int choice)
-{
-    switch (choice)
-    {
-        case 1:
-
-
-    }
-}
 
 int read_menu_choice(void)
 {
