@@ -1,4 +1,4 @@
-//TODO: Wrap all functions into a loop that takes inputß
+//complete
 
 #include <stdio.h> 
 #include <string.h>
@@ -19,7 +19,7 @@ int main(void)
     
     int choice = 0;
     char item[32];
-
+    int getitout;
     do
     {
         inv_list(inventory, count);
@@ -27,28 +27,20 @@ int main(void)
         switch(choice)
         {
             case 1:
+
                 printf("Enter item name (32 character limit): \n");
-                fgets(item,32,stdin);
+                fgets(item, sizeof(item), stdin);
+                item[strcspn(item, "\n")] = '\0';
                 inv_add(inventory, &count, item);
                 break;
             case 2:
-                    do
-                    {
-                        printf("Select the index of an item to remove: \n");
-                        int rmIndex = 11;
-                        int input = scanf("%i", &rmIndex);
-
-                        if(input != 1)
-                        {
-                            int c;
-                            while ((c = getchar()) != '\n' && c != EOF){ }
-                            choice = 11;
-                        }
-                    
-
-                    } while (choice < 0 || choice > count);
+                printf("Enter index to remove: \n");
+                scanf("%d", &getitout);
+                inv_remove(inventory, &count, getitout);
+                break;
+            default:
+                break;      
         }
-
     } while (choice != 3);
     
 
@@ -73,6 +65,9 @@ int read_menu_choice(void)
         
 
     } while (choice < 1 || choice > 3);
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF); 
     
     return choice;
 }
