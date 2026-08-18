@@ -22,6 +22,7 @@ int main(void)
     int choice = 0;
     char item[32];
     int getitout;
+    int scancheck;
     do
     {
         inv_list(inventory, count);
@@ -38,17 +39,24 @@ int main(void)
                 break;
             case 2:
                 printf("Enter index to remove (0-9 index): \n");
-                scanf("%d", &getitout); 
-
-                rmv_check = inv_remove(inventory, &count, getitout);
-                if(rmv_check == 0) printf("Not a valid removal index.\n");
+                scancheck = scanf("%d", &getitout); 
+                if(scancheck != 1)
+                {
+                    printf("Index input wasn't valid\n");
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF) { }
+                }
+                else
+                {
+                    rmv_check = inv_remove(inventory, &count, getitout);
+                    if(rmv_check == 0) printf("Not a valid removal index.\n");
+                }
                 break;
             default:
                 break;      
         }
     } while (choice != 3);
     
-
 }
 
 int read_menu_choice(void)
@@ -122,10 +130,7 @@ int inv_remove(char names[][32], int *count, int index)
         int amount = *count - 1;
         for (int i = index; i < amount; i++)
         {
-            if(i != amount)
-            {
-                strcpy(names[i], names[i+1]);
-            }
+            strcpy(names[i], names[i+1]);
         }
 
         *count -= 1;
