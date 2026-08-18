@@ -1,11 +1,11 @@
-// todo
+// todo 
 #include <stdio.h>
 #include <string.h>
 
-int rowz = 0;
-int colz = 0;
+int rowz = 7;
+int colz = 12;
 
-void draw_map1(char map[rowz][colz], int player_row, int player_col);
+void draw_map(char map[rowz][colz], int player_row, int player_col);
 int try_move(char map[rowz][colz], int *row, int *col, char dir);
 char get_dir(void);
 
@@ -15,27 +15,9 @@ int main(void)
     int player_col = 1;
     int wall_in_way = 1;
     char direction;
-    char mapsel[4];
-    char *selected_map;
 
-    char map1[5][7] = 
-    {
-        {'#','#','#','#','#','#','#'},
-        {'#','.','.','.','.','.','#'},
-        {'#','.','.','.','.','.','#'},
-        {'#','.','.','.','.','.','#'},
-        {'#','#','#','#','#','#','#'}
-    };
 
-    char map2[6][10] = 
-    {
-        {'#','#','#','#','#','#','#','#','#','#'},
-        {'#','.','.','.','.','.','.','.','.','#'},
-        {'#','.','#','#','.','.','#','#','.','#'},
-        {'#','.','#','#','.','.','#','#','.','#'},
-        {'#','.','.','.','.','.','.','.','.','#'},
-        {'#','#','#','#','#','#','#','#','#','#'}
-    };
+
 
     char map3[7][12] = 
     {
@@ -48,53 +30,29 @@ int main(void)
         {'#','#','#','#','#','#','#','#','#','#','#','#'}
     };
 
-    do
-    {
-        printf("Enter a, b or c to select a different map\n");
-        fgets(mapsel, sizeof(mapsel), stdin);
-        mapsel[strcspn(mapsel, "\n")] = '\0';
-    } while (mapsel[0] != 'a' && mapsel[0] != 'b' && mapsel[0] != 'c');
-    
-    if(mapsel[0] == 'a')
-    {
-        rowz = 5;
-        colz = 7;
-        selected_map = map1;
-    }
-    else if(mapsel[0] == 'b')
-    {
-        rowz = 6;
-        colz = 10;
-    }
-    else
-    {
-        rowz = 7;
-        colz = 12;
-    }
+    draw_map(map3, player_row, player_col);
 
     do
     {
         if(wall_in_way == 1 && direction)
         {
-            
-            draw_map1(map1, player_row, player_col);
+            draw_map(map3, player_row, player_col);
         }
         direction = get_dir();
-        wall_in_way = try_move(map1, &player_row, &player_col, direction);
+        wall_in_way = try_move(map3, &player_row, &player_col, direction);
 
     } while (direction != 'q');
     
 
 
-    draw_map1(map1, player_row, player_col);
 
 }
 
-void draw_map1(char map[rowz][colz], int player_row, int player_col)
+void draw_map(char map[rowz][colz], int player_row, int player_col)
 {
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < rowz; i++)
     {
-        for(int j = 0; j < 7; j++)
+        for(int j = 0; j < colz; j++)
         {
             if(i == player_row && j == player_col)
             {
