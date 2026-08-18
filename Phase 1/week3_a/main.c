@@ -3,8 +3,8 @@
 #include <stdio.h> 
 #include <string.h>
 
-void inv_add(char names[][32], int *count, const char *name); //appends(adds) if room
-void inv_remove(char names[][32], int *count, int index); //removes at index by shifting later items down
+int inv_add(char names[][32], int *count, const char *name); //appends(adds) if room
+int inv_remove(char names[][32], int *count, int index); //removes at index by shifting later items down
 void inv_list(char names[][32], int count); //prints item list
 int read_menu_choice(void);
 
@@ -17,6 +17,8 @@ int main(void)
         {'E','l','i','x','i','r'}
     };
     
+    int add_check;
+    int rmv_check;
     int choice = 0;
     char item[32];
     int getitout;
@@ -31,12 +33,15 @@ int main(void)
                 printf("Enter item name (32 character limit): \n");
                 fgets(item, sizeof(item), stdin);
                 item[strcspn(item, "\n")] = '\0';
-                inv_add(inventory, &count, item);
+                add_check = inv_add(inventory, &count, item);
+                if(add_check == 0) printf("Looks like your inventory is full!\n");
                 break;
             case 2:
-                printf("Enter index to remove: \n");
-                scanf("%d", &getitout);
-                inv_remove(inventory, &count, getitout);
+                printf("Enter index to remove (0-9 index): \n");
+                scanf("%d", &getitout); 
+
+                rmv_check = inv_remove(inventory, &count, getitout);
+                if(rmv_check == 0) printf("Not a valid removal index.\n");
                 break;
             default:
                 break;      
@@ -45,7 +50,6 @@ int main(void)
     
 
 }
-
 
 int read_menu_choice(void)
 {
@@ -82,29 +86,50 @@ void inv_list(char names[][32], int count)
     }
 }
 
-void inv_add(char names[][32], int *count, const char *name)
+int inv_add(char names[][32], int *count, const char *name)
 {
+    int isitfull = 1;
     int length = strlen(name);
 
     int spot = *count;
-    for(int i = 0; i < length; i++)
+    if(spot == 10)
     {
-        names[spot][i] = name[i];
+        isitfull = 0;
     }
-        
-    *count += 1;
+    else
+    {
+        for(int i = 0; i < length; i++)
+        {
+            names[spot][i] = name[i];
+        }
+        names[spot][length] = '\0';
+        *count += 1;
+    }
+    return isitfull;
 }   
 
-void inv_remove(char names[][32], int *count, int index)
+int inv_remove(char names[][32], int *count, int index)
 {
-    int amount = *count - 1;
-    for (int i = index; i < amount; i++)
+    int validIndex = 1;
+    int spot = *count;
+
+    if(index > (spot - 1) || index < 0)
     {
-        if(i != amount)
+        validIndex = 0;
+    }
+    else
+    {
+        int amount = *count - 1;
+        for (int i = index; i < amount; i++)
         {
-            strcpy(names[i], names[i+1]);
+            if(i != amount)
+            {
+                strcpy(names[i], names[i+1]);
+            }
         }
+
+        *count -= 1;
     }
 
-    *count -= 1;
+    return validIndex;
 }
