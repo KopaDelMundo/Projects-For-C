@@ -1,25 +1,25 @@
-// todo 
 #include <stdio.h>
 #include <string.h>
 
-int rowz = 7;
-int colz = 12;
+#define ROWS 7
+#define COLS 12
 
-void draw_map(char map[rowz][colz], int player_row, int player_col);
-int try_move(char map[rowz][colz], int *row, int *col, char dir);
+
+void draw_map(char map[ROWS][COLS], int player_row, int player_col);
+int try_move(char map[ROWS][COLS], int *row, int *col, char dir);
 char get_dir(void);
 
 int main(void)
 {
     int player_row = 1;
     int player_col = 1;
-    int wall_in_way = 1;
+    int move_success = 1;
     char direction;
 
 
 
 
-    char map3[7][12] = 
+    char map3[ROWS][COLS] = 
     {
         {'#','#','#','#','#','#','#','#','#','#','#','#'},
         {'#','.','.','.','.','#','.','.','.','.','.','#'},
@@ -34,12 +34,13 @@ int main(void)
 
     do
     {
-        if(wall_in_way == 1 && direction)
+
+        direction = get_dir();
+        move_success = try_move(map3, &player_row, &player_col, direction);
+        if(move_success == 1)
         {
             draw_map(map3, player_row, player_col);
         }
-        direction = get_dir();
-        wall_in_way = try_move(map3, &player_row, &player_col, direction);
 
     } while (direction != 'q');
     
@@ -48,11 +49,11 @@ int main(void)
 
 }
 
-void draw_map(char map[rowz][colz], int player_row, int player_col)
+void draw_map(char map[ROWS][COLS], int player_row, int player_col)
 {
-    for(int i = 0; i < rowz; i++)
+    for(int i = 0; i < ROWS; i++)
     {
-        for(int j = 0; j < colz; j++)
+        for(int j = 0; j < COLS; j++)
         {
             if(i == player_row && j == player_col)
             {
@@ -67,15 +68,13 @@ void draw_map(char map[rowz][colz], int player_row, int player_col)
     }
 }
 
-int try_move(char map[rowz][colz], int *row, int *col, char dir)
+int try_move(char map[ROWS][COLS], int *row, int *col, char dir) 
 {
-    //int rowpos = *row;
-    //int colpos = *col;
     int success = 0;
     switch(dir)
     {
         case 'w':
-            if (map[*row-1][*col] == '.')
+            if ((*row-1) >= 0 && map[*row-1][*col] == '.')
             {
                 *row -= 1;
                 success = 1;
@@ -86,7 +85,7 @@ int try_move(char map[rowz][colz], int *row, int *col, char dir)
             }
             break;
         case 'a':
-            if (map[*row][*col-1] == '.')
+            if ((*col-1) >= 0 && map[*row][*col-1] == '.')
             {
                 *col -= 1;
                 success = 1;
@@ -97,7 +96,7 @@ int try_move(char map[rowz][colz], int *row, int *col, char dir)
             }
             break;
         case 's':
-            if (map[*row+1][*col] == '.')
+            if ((*row+1) < ROWS && map[*row+1][*col] == '.' )
             {
                 *row += 1;
                 success = 1;
@@ -108,7 +107,7 @@ int try_move(char map[rowz][colz], int *row, int *col, char dir)
             }
             break;
         case 'd':
-            if (map[*row][*col+1] == '.')
+            if ((*col+1) < COLS && map[*row][*col+1] == '.')
             {
                 *col += 1;
                 success = 1;
@@ -121,7 +120,7 @@ int try_move(char map[rowz][colz], int *row, int *col, char dir)
            case 'q':
             break; 
         default:
-            printf("Looks like this broke somehow\n");
+            printf("Unknown key\n");
     }
     return success;
 }
