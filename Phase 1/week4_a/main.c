@@ -14,7 +14,7 @@ int main(void)
 
     size_t stringLength = my_strlen(test);
     my_strcpy(copyDestTest, test);
-    int cmp_dif = my_strcmp(test, "Test");
+    int cmp_dif = my_strcmp("cat", "dog");
 
     printf("The string length is %zu\n", stringLength);
     printf("copyDestTest is now: %s\n", copyDestTest);
@@ -57,24 +57,15 @@ void my_strcpy(char* dest, const char* b)
         dest++;
         b++;
     }
+    *dest = '\0';
 }
 
 int my_strcmp(const char* a, const char* b)
 {
-    int a_end = 0;
-    int b_end = 0;
-
-    while(*a != '\0')
+    while(*a == *b && *a != '\0')
     {
-        a_end++;
         a++;
-    }
-
-    while(*b != '\0')
-    {
-        b_end++;
         b++;
     }
-
-    return a_end - b_end;
+    return *a - *b;
 }

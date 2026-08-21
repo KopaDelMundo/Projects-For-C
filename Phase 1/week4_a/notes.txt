@@ -1,0 +1,11 @@
+my_strcmp
+
+isn't comparing but measuring
+
+it needs to walk both points together in lockstep
+loop while they are equal and you haven't hit the end 
+
+once they differ, return *a - *b  
+
+catndogz\0
+canine\0
