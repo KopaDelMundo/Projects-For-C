@@ -1,0 +1,9 @@
+lines for combat log
+
+x attacks y! %d damage!
+x's attack missed!
+...it was critical
+x uses an item
+
+
+
