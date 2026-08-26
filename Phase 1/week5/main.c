@@ -38,7 +38,10 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
             }
             else if(isspace(*line) && verb_start_flag == 1)
             {
-                if(*line - 1)
+                if(!isspace(*line - 1))
+                {
+                    break;
+                }
             }
 
             line++;
