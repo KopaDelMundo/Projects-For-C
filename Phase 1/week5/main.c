@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
 void log_hit(const char* attacker, const char* defender, int dmg, int is_crit, int is_miss);
 int parse_command(const char* line, char*verb_out, char *arg_out);
 void note_trunc(int written, int buffer_size);
+int is_NotEmpty(char* input);
 
 
 int main(void)
@@ -15,10 +18,45 @@ int main(void)
 int parse_command(const char* line, char*verb_out, char *arg_out)
 {
     int tokens = 0;//spaces indicate # of tokens
-    char* cmds[] = {"attack", "use", "look", "quit"}; //valid commands
+    char* verbs[] = {"attack", "use", "look", "quit"}; //valid commands
+    char* enemy_nouns[] = {"goblin, slime"};
+    char* item_nouns[] = {"potion", "elixir"};
+    char verb_buf[32];
+    char noun_buf[32];
 
+    if(!is_NotEmpty(line)) return 0;
     
+    //find cmd
+    while(*line != '\0')
+    {
+        
+    }
 
+
+
+
+}
+
+int is_NotEmpty(char* input)
+{
+    if(input == NULL) return 0;
+
+    while(*input != '\0')
+    {
+        if(!isspace((unsigned char)*input))
+        {
+            break;
+        }
+
+        input++;
+    }
+
+    if(*input == '\0')
+    {
+        return 0;
+    }
+  
+    return 1;
 }
 
 void log_hit(const char* attacker, const char* defender, int dmg, int is_crit, int is_miss)
