@@ -22,6 +22,8 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     char* enemy_nouns[] = {"goblin, slime"};
     char* item_nouns[] = {"potion", "elixir"};
     char verb_buf[32];
+    char* verb_p = &verb_buf;
+    int verb_start_flag = 0;
     char noun_buf[32];
 
     if(!is_NotEmpty(line)) return 0;
@@ -29,7 +31,18 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     //find cmd
     while(*line != '\0')
     {
-        
+            if(!isspace(*line))
+            {
+                if(verb_start_flag == 0) verb_start_flag = 1;
+                *verb_p = *line;
+            }
+            else if(isspace(*line) && verb_start_flag == 1)
+            {
+                if(*line - 1)
+            }
+
+            line++;
+            verb_p++;
     }
 
 
