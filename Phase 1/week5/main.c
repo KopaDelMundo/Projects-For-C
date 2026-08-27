@@ -5,7 +5,7 @@
 void log_hit(const char* attacker, const char* defender, int dmg, int is_crit, int is_miss);
 int parse_command(const char* line, char*verb_out, char *arg_out);
 void note_trunc(int written, int buffer_size);
-int is_NotEmpty(char* input);
+int is_NotEmpty(const char* input);
 
 
 int main(void)
@@ -13,11 +13,15 @@ int main(void)
     //log_hit("Hubert Blaine Wolfeschlegelsteinhausenbergerdorff", "Slime", 200, 1, 0);
     log_hit("Aaron", "Slime", 200, 1, 0);
     log_hit("Slime", "Aaron", 100, 1, 1);
+
 }
 
 int parse_command(const char* line, char*verb_out, char *arg_out)
 {
-    int tokens = 0;//spaces indicate # of tokens
+    //0 for first word not valid
+    //1 for valid first cmd, but doesnt account for second word (might also mean quit)
+    //2 if valid noun (and verb isn't quit)
+    
     char* verbs[] = {"attack", "use", "look", "quit"}; //valid commands
     char* enemy_nouns[] = {"goblin, slime"};
     char* item_nouns[] = {"potion", "elixir"};
@@ -42,18 +46,18 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
             } 
             else if(current_word_flag == 1)
             {
-                *verb_p == *line;
+                *verb_p = *line;
                 verb_p++;
             }
             else if(current_word_flag == 2)
             {
-                *noun_p == *line;
+                *noun_p = *line;
                 noun_p++;
             }
         }
         else if(isspace(*line) && current_word_flag == 1)
         {
-            current_word_flag == 2;
+            current_word_flag = 2;
         }
         line++;
     }
@@ -61,7 +65,7 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     *verb_p = '\0';
     *noun_p = '\0';
 
-    //search for valid verb in verbs
+    //search for valid verb in verbs[]
     for(int i = 0; i < 4; i++)
     {
         if(strcmp(verbs[i], verb_buf) == 0)
@@ -76,15 +80,31 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     if(!is_valid_cmd)
     {
         printf("Please enter valid command.\n");
-        return 1;
+        return 0;
     } 
 
-    //if cmd was "use", look item nouns, else look in enemy nouns
-    if(strcmp(verbs[1], verb_buf))
+    if(strcmp(verbs[3], verb_buf))
+    {
+        //need to come up with stuff to do to quit
+    }
+    if(strcmp(verbs[1], verb_buf))  //if cmd was "use", look item nouns, else look in enemy nouns
     {
         for(int i = 0; i < 2; i++)
         {
             if(strcmp(item_nouns[i], noun_buf) == 0)
+            {
+                is_valid_noun = 1;
+
+                strcpy(arg_out, noun_buf);
+                break;
+            }
+        }
+    }
+    else 
+    {
+        for(int i = 0; i < 2; i++)
+        {
+            if(strcmp(enemy_nouns[i], noun_buf) == 0)
             {
                 is_valid_noun = 1;
 
@@ -93,15 +113,18 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
             }
         }
     }
-    else 
+
+    if(!is_valid_noun)
     {
-        for(int)
+        printf("Second word of command not valid.\n");
+        return 1;
     }
 
+    return 2;
 
 }
 
-int is_NotEmpty(char* input)
+int is_NotEmpty(const char* input)
 {
     if(input == NULL) return 0;
 
