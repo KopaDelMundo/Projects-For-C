@@ -32,9 +32,6 @@ int main(void)
     {
         behaviors[badguys[i].type](&badguys[i]);
     }
-
-    
-
 }
 
 

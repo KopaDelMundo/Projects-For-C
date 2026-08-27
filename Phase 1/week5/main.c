@@ -22,33 +22,81 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     char* enemy_nouns[] = {"goblin, slime"};
     char* item_nouns[] = {"potion", "elixir"};
     char verb_buf[32];
-    char* verb_p = &verb_buf;
-    int verb_start_flag = 0;
+    char *verb_p = verb_buf;
+    int current_word_flag = 0;
     char noun_buf[32];
+    char *noun_p = noun_buf; 
+    int is_valid_cmd = 0;
+    int is_valid_noun = 0;
 
     if(!is_NotEmpty(line)) return 0;
     
-    //find cmd
+    //parse verb and noun
     while(*line != '\0')
     {
-            if(!isspace(*line))
+        if(!isspace(*line))
+        {
+            if(current_word_flag == 0)
             {
-                if(verb_start_flag == 0) verb_start_flag = 1;
-                *verb_p = *line;
-            }
-            else if(isspace(*line) && verb_start_flag == 1)
+                current_word_flag = 1;
+            } 
+            else if(current_word_flag == 1)
             {
-                if(!isspace(*line - 1))
-                {
-                    break;
-                }
+                *verb_p == *line;
+                verb_p++;
             }
-
-            line++;
-            verb_p++;
+            else if(current_word_flag == 2)
+            {
+                *noun_p == *line;
+                noun_p++;
+            }
+        }
+        else if(isspace(*line) && current_word_flag == 1)
+        {
+            current_word_flag == 2;
+        }
+        line++;
     }
 
+    *verb_p = '\0';
+    *noun_p = '\0';
 
+    //search for valid verb in verbs
+    for(int i = 0; i < 4; i++)
+    {
+        if(strcmp(verbs[i], verb_buf) == 0)
+        {
+            is_valid_cmd = 1;
+
+            strcpy(verb_out, verb_buf);
+            break;
+        }
+    }
+    //handle invalid verb
+    if(!is_valid_cmd)
+    {
+        printf("Please enter valid command.\n");
+        return 1;
+    } 
+
+    //if cmd was "use", look item nouns, else look in enemy nouns
+    if(strcmp(verbs[1], verb_buf))
+    {
+        for(int i = 0; i < 2; i++)
+        {
+            if(strcmp(item_nouns[i], noun_buf) == 0)
+            {
+                is_valid_noun = 1;
+
+                strcpy(verb_out, verb_buf);
+                break;
+            }
+        }
+    }
+    else 
+    {
+        for(int)
+    }
 
 
 }
