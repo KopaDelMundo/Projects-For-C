@@ -24,3 +24,17 @@ x uses an item
         line++;
         verb_p++;
     }
+-------
+
+
+attack goblin                 //verb and argument both extracted; returns 2
+look                          //verb extracted, returns 1; the argument buffer holds whatever you documented, never stale data from a previous parse
+`` (empty line, just Enter)   //returns 0; no crash; prompt returns
+attack goblin                 //Parsed the same as the clean version — leading, trailing, and repeated spaces absorbed
+(only spaces)                 //returns 0, treated as empty
+dance                         //unknown command
+attack goblin then look       //The second parse must not leave the argument from the first parse visible
+a 200 char line               //No overflow, no crash; input is bounded
+a name longer than log buffer //message truncates safely, no crash or corrupted output
+quit                          //exits - verifying the trailing new line isn't preventing matching
+

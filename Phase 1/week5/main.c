@@ -2,6 +2,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#define TESTSTRINGS 8
+
 void log_hit(const char* attacker, const char* defender, int dmg, int is_crit, int is_miss);
 int parse_command(const char* line, char*verb_out, char *arg_out);
 void note_trunc(int written, int buffer_size);
@@ -11,9 +13,33 @@ int is_NotEmpty(const char* input);
 int main(void)
 {
     //log_hit("Hubert Blaine Wolfeschlegelsteinhausenbergerdorff", "Slime", 200, 1, 0);
-    log_hit("Aaron", "Slime", 200, 1, 0);
-    log_hit("Slime", "Aaron", 100, 1, 1);
+    //log_hit("Aaron", "Slime", 200, 1, 0);
+    //log_hit("Slime", "Aaron", 100, 1, 1);
+    char cmd_verb[32];
+    char cmd_noun[32];
+    int tokens;
 
+    char* testStrings[TESTSTRINGS] = {
+        "attack goblin", "look", "", "     ", "attack slime than look", "quit",
+        "attack HubertBlaineWolfeschlegelsteinhausenbergerdorff", "dance"
+    };
+
+    for(int i = 0; i < TESTSTRINGS; i++)
+    {
+        printf("======================================\n");
+        printf("CMD TO TEST: %s\n", testStrings[i]);
+        tokens = parse_command(testStrings[i], cmd_verb, cmd_noun);
+        printf("Amount of tokens: %d\n", tokens);
+        if(tokens == 2)
+        {
+            printf("CMD: %s %s\n", cmd_verb, cmd_noun);
+        } 
+        else if(tokens == 1)
+        {
+            printf("CMD: %s\n", cmd_verb);
+        }
+        printf("======================================\n");
+    }
 }
 
 int parse_command(const char* line, char*verb_out, char *arg_out)
@@ -22,16 +48,18 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     //1 for valid first cmd, but doesnt account for second word (might also mean quit)
     //2 if valid noun (and verb isn't quit)
     
-    char* verbs[] = {"attack", "use", "look", "quit"}; //valid commands
-    char* enemy_nouns[] = {"goblin, slime"};
-    char* item_nouns[] = {"potion", "elixir"};
+    char* verbs[] = {"attack", "use", "look", "quit"};  //valid commands
+    char* enemy_nouns[] = {"goblin", "slime"};          //valid enemies
+    char* item_nouns[] = {"potion", "elixir"};          //valid items 
     char verb_buf[32];
     char *verb_p = verb_buf;
-    int current_word_flag = 0;
+    int current_word_flag = 1;
     char noun_buf[32];
     char *noun_p = noun_buf; 
     int is_valid_cmd = 0;
     int is_valid_noun = 0;
+
+    printf("||DEBUG|| line: %s\n", line);
 
     if(!is_NotEmpty(line)) return 0;
     
@@ -40,11 +68,8 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     {
         if(!isspace(*line))
         {
-            if(current_word_flag == 0)
-            {
-                current_word_flag = 1;
-            } 
-            else if(current_word_flag == 1)
+
+            if(current_word_flag == 1)
             {
                 *verb_p = *line;
                 verb_p++;
@@ -65,13 +90,16 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     *verb_p = '\0';
     *noun_p = '\0';
 
+    printf("||DEBUG|| verb_buf:_%s_\n", verb_buf);
+    printf("||DEBUG|| noun_buf:_%s_\n", noun_buf);
+
     //search for valid verb in verbs[]
     for(int i = 0; i < 4; i++)
     {
         if(strcmp(verbs[i], verb_buf) == 0)
         {
             is_valid_cmd = 1;
-
+            
             strcpy(verb_out, verb_buf);
             break;
         }
@@ -79,44 +107,48 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
     //handle invalid verb
     if(!is_valid_cmd)
     {
-        printf("Please enter valid command.\n");
+        printf("Unknown Command: Please enter valid command.\n");
         return 0;
     } 
 
-    if(strcmp(verbs[3], verb_buf))
+    if(strcmp(verbs[3], verb_buf) == 0) return 1;
+
+    if(strcmp(verbs[1], verb_buf) == 0)  //if cmd was "use", look item nouns, else look in enemy nouns
     {
-        //need to come up with stuff to do to quit
-    }
-    if(strcmp(verbs[1], verb_buf))  //if cmd was "use", look item nouns, else look in enemy nouns
-    {
+        printf("||DEBUG|| looking for item...\n");
         for(int i = 0; i < 2; i++)
         {
             if(strcmp(item_nouns[i], noun_buf) == 0)
             {
                 is_valid_noun = 1;
-
+                printf("||DEBUG||comparing from enemy_nouns: %s\n", item_nouns[i]);
                 strcpy(arg_out, noun_buf);
                 break;
             }
         }
+        
     }
-    else 
+    
+    if(strcmp(verbs[0], verb_buf) == 0)
     {
+        printf("||DEBUG|| looking for enemy...\n");
         for(int i = 0; i < 2; i++)
         {
+            printf("||DEBUG||comparing from enemy_nouns: %s\n", enemy_nouns[i]);
             if(strcmp(enemy_nouns[i], noun_buf) == 0)
             {
                 is_valid_noun = 1;
-
-                strcpy(verb_out, verb_buf);
+                
+                strcpy(arg_out, noun_buf);
                 break;
             }
         }
+        
     }
 
     if(!is_valid_noun)
     {
-        printf("Second word of command not valid.\n");
+        printf("Unknown Command: Second word of command not valid.\n");
         return 1;
     }
 
