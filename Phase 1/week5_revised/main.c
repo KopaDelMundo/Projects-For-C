@@ -17,13 +17,22 @@ int main(void)
         do
         {
             printf("Enter command for battle: \n");
-            fgets(cmd_line, sizeof(cmd_line), stdin);
-            if(strchr(cmd_line, '\n') == NULL)
+            char* input_p = fgets(cmd_line, sizeof(cmd_line), stdin);
+            if(input_p != NULL)
             {
-                int c;
-                while ((c = getchar()) != '\n' && c != EOF) {};
-                printf("Your cmd was too long, try something shorter.\n");
+                if(strchr(cmd_line, '\n') == NULL)
+                {
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF) {};
+                    printf("Your cmd was too long, try something shorter.\n");
+                }
             }
+            else
+            {
+                printf("Input Ended.\n");
+                return 0;
+            }
+            
         } while (strchr(cmd_line, '\n') == NULL);
         
         cmd_line[strcspn(cmd_line, "\n")] = '\0';
