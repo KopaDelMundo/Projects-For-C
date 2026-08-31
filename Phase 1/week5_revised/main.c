@@ -14,17 +14,23 @@ int main(void)
 
     while(1)
     {
-        printf("Enter command for battle: \n");
-        fgets(cmd_line, sizeof(cmd_line), stdin);
-        if(strchr(cmd_line, '\n') == NULL)
+        do
         {
-            int c;
-            while ((c = getchar()) != '\n' && c != EOF) {};
-            printf("Your cmd was too long, try something shorter.\n");
-        }
+            printf("Enter command for battle: \n");
+            fgets(cmd_line, sizeof(cmd_line), stdin);
+            if(strchr(cmd_line, '\n') == NULL)
+            {
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF) {};
+                printf("Your cmd was too long, try something shorter.\n");
+            }
+        } while (strchr(cmd_line, '\n') == NULL);
+        
         cmd_line[strcspn(cmd_line, "\n")] = '\0';
 
         tokens = parse_command(cmd_line, cmd_verb, cmd_noun);
+
+        printf("Parsed Line: %s %s\n", cmd_verb, cmd_noun);
 
         if(tokens == 0)
         {
@@ -32,14 +38,17 @@ int main(void)
         }
         else if(tokens == 1)
         {
-            printf("One word detected:\n");
+            if(strcmp("quit", cmd_verb) == 0)
+            {
+                printf("Quitting program...\n");
+                break;
+            }
+            printf("One word detected\n");
         }
         else if (tokens == 2)
         {
-            printf("Two Words detected: %s %s\n", cmd_verb, cmd_noun);
+            printf("Two Words detected\n");
         }
-
-        if(strcmp(cmd_verb, "quit") == 0) break;
     }
 }
 
