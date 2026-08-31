@@ -17,29 +17,28 @@ int main(void)
     //log_hit("Slime", "Aaron", 100, 1, 1);
     char cmd_verb[32];
     char cmd_noun[32];
-    int tokens;
+    char cmd_raw[64];
+    //int tokens;
 
-    char* testStrings[TESTSTRINGS] = {
-        "attack goblin", "look", "", "     ", "attack slime than look", "quit",
-        "attack HubertBlaineWolfeschlegelsteinhausenbergerdorff", "dance"
-    };
-
-    for(int i = 0; i < TESTSTRINGS; i++)
+    while(1)
     {
-        printf("======================================\n");
-        printf("CMD TO TEST: %s\n", testStrings[i]);
-        tokens = parse_command(testStrings[i], cmd_verb, cmd_noun);
-        printf("Amount of tokens: %d\n", tokens);
-        if(tokens == 2)
+        printf("Enter command for battle: \n");
+        fgets(cmd_raw, sizeof(cmd_raw), stdin);
+        if(strchr(cmd_raw, '\n') == NULL)
         {
-            printf("CMD: %s %s\n", cmd_verb, cmd_noun);
-        } 
-        else if(tokens == 1)
-        {
-            printf("CMD: %s\n", cmd_verb);
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF) {};
+            printf("Your cmd was too long, try something shorter.\n");
         }
-        printf("======================================\n");
+        cmd_raw[strcspn(cmd_raw, "\n")] = '\0';
+
+        parse_command(cmd_raw, cmd_verb, cmd_noun);
+        
+        if(strcmp(cmd_verb, "quit") == 0) break;
     }
+
+
+
 }
 
 int parse_command(const char* line, char*verb_out, char *arg_out)
@@ -129,7 +128,7 @@ int parse_command(const char* line, char*verb_out, char *arg_out)
         
     }
     
-    if(strcmp(verbs[0], verb_buf) == 0)
+    if(strcmp(verbs[0], verb_buf) == 0 || strcmp(verbs[2], verb_buf) == 0)
     {
         printf("||DEBUG|| looking for enemy...\n");
         for(int i = 0; i < 2; i++)
@@ -180,7 +179,7 @@ int is_NotEmpty(const char* input)
 
 void log_hit(const char* attacker, const char* defender, int dmg, int is_crit, int is_miss)
 {
-    char buf[30];
+    char buf[64];
     int buf_size = (int)sizeof(buf);
     int n = 0;
 
