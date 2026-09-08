@@ -78,7 +78,43 @@ int main(void)
         .state=STATE_IDLE
     };
 
+    Entity e2 = {
+        .pos={
+            .x=200,
+            .y=200,
+        },
+        .vel={
+            .x=0,
+            .y=0
+        },
+        .hp=1000,
+        .max_hp=1000,
+        .facing=1,
+        .state=STATE_IDLE
+    };
+
     print_entity(&e1);
+    set_state(&e1, STATE_RUN);
+    print_entity(&e1);
+    set_state(&e1, STATE_ATTACK);
+    print_entity(&e1);
+    set_state(&e1, STATE_HURT);
+    print_entity(&e1);
+    set_state(&e1, STATE_DEAD);
+    print_entity(&e1);
+    set_state(&e1, STATE_RUN);
+    print_entity(&e1);
+    set_state(&e1, STATE_ATTACK);
+    print_entity(&e1);
+    set_state(&e1, STATE_HURT);
+    print_entity(&e1);
+    printf("---ENTITY 2 TESTING---");
+    entity_take_damage(&e2, 500);
+    print_entity(&e2);
+    entity_take_damage(&e2, 500);
+    print_entity(&e2);
+    entity_take_damage(&e2, 500);
+    print_entity(&e2);
 }
 
 void print_entity(const Entity *e)
@@ -125,30 +161,29 @@ const char* state_name( EntityState s)
 
 int can_transition(EntityState from, EntityState to)
 {
-    //IDLE, RUN, ATTACK, HURT, DEAD
-    //same order for columns
     //Table answers "can [col] transiton to the state at [row]"
     //0 means no, 1 means yes, 2 means its the same state so nothing is to be done
+    //IDLE, RUN, ATTACK, HURT, DEAD (same order for columns)
     const int legal[STATE_COUNT][STATE_COUNT] = {
         {2, 1, 1, 1, 0},
         {1, 2, 1, 0, 0},
-        {1, 1, 2, 0, 0},
-        {1, 1, 1, 2, 0},
-        {0, 0, 0, 1, 2}
+        {1, 1, 2, 1, 0},
+        {1, 1, 0, 2, 1},
+        {0, 0, 0, 0, 2}
     }; 
-
+    printf("DEBUG: legal[%d][%d] = %d\n", from, to, legal[from][to]);
     return legal[from][to];
 }
 
 void set_state(Entity *e, EntityState to)
 {
     int legal_transition = can_transition(e->state, to);
-    if(legal_transition)
+    if(legal_transition == 1)
     {
         printf("DEBUG: Legal transtition between states.\n");
         e->state = to;
     }
-    else if(!legal_transition)
+    else if(legal_transition == 0)
     {
         printf("DEBUG: Not a legal transition. No change made.\n");
     }
@@ -160,5 +195,14 @@ void set_state(Entity *e, EntityState to)
 
 void entity_take_damage(Entity *e, int dmg)
 {
-    
+    //if hp is more than 0 then you aren't dead
+    if(e->hp > 0)
+    {
+        e->hp -= dmg;
+        set_state(e, STATE_HURT);
+    }
+    if(e->hp <= 0)
+    {
+        set_state(e, STATE_DEAD);
+    }
 }
