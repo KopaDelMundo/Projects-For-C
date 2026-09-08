@@ -10,7 +10,8 @@ typedef enum {
     STATE_RUN,
     STATE_ATTACK,
     STATE_HURT,
-    STATE_DEAD
+    STATE_DEAD,
+    STATE_COUNT //keeps track of number of states in enum
 } EntityState;
 
 typedef struct {
@@ -55,10 +56,10 @@ typedef struct {
 
 //--------------function prototypes--------------
 int can_transition(EntityState from, EntityState to);   //handles rules of transitioning states (eg you can't leave state_dead)
-void set_state(Entity *e, Entity to);                   //transitions only if can_transition allows
+void set_state(Entity *e, EntityState to);              //transitions only if can_transition allows
 void entity_take_damage(Entity *e, int dmg);            //subtracts hp, forces state_hurt (or state_dead at 0 hp)
 void print_entity(const Entity *e);                     //one line status (const reading only)
-const char* state_name(EntityState s);
+const char* state_name(EntityState s);                  //turns enum into string literal
 
 int main(void)
 {
@@ -123,6 +124,41 @@ const char* state_name( EntityState s)
 }
 
 int can_transition(EntityState from, EntityState to)
+{
+    //IDLE, RUN, ATTACK, HURT, DEAD
+    //same order for columns
+    //Table answers "can [col] transiton to the state at [row]"
+    //0 means no, 1 means yes, 2 means its the same state so nothing is to be done
+    const int legal[STATE_COUNT][STATE_COUNT] = {
+        {2, 1, 1, 1, 0},
+        {1, 2, 1, 0, 0},
+        {1, 1, 2, 0, 0},
+        {1, 1, 1, 2, 0},
+        {0, 0, 0, 1, 2}
+    }; 
+
+    return legal[from][to];
+}
+
+void set_state(Entity *e, EntityState to)
+{
+    int legal_transition = can_transition(e->state, to);
+    if(legal_transition)
+    {
+        printf("DEBUG: Legal transtition between states.\n");
+        e->state = to;
+    }
+    else if(!legal_transition)
+    {
+        printf("DEBUG: Not a legal transition. No change made.\n");
+    }
+    else if(legal_transition == 2)
+    {
+        printf("DEBUG: Entity is already in the requested state.\n");
+    } 
+}
+
+void entity_take_damage(Entity *e, int dmg)
 {
     
 }
