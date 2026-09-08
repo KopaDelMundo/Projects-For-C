@@ -1,0 +1,60 @@
+#include <stdio.h>
+
+typedef struct {
+    int x;
+    float y;
+    char z;
+} mystruct;
+
+typedef union {
+    int x;
+    float y;
+    char z;
+} myunion;
+
+typedef struct {
+    char *name;
+    int isrobot;
+    union {
+        char* personality;
+        int firmware_version;
+    };
+} character;
+
+void print_character(character* a)
+{
+    printf("character name: %s\n", a->name);
+    if(a->isrobot)
+    {
+        printf("version %d\n", a->firmware_version);
+    }
+    else
+    {
+        printf("personality: %s\n", a->personality);
+    }
+}
+
+int main(void)
+{
+
+    mystruct a = {10, 15.5789, 'A'};
+    mystruct b = {20, 25.5789, 'B'};
+
+    printf("For mystruct a: {%d, %f, %c}\n", a.x, a.y, a.z);
+    printf("For myunion b: {%d, %f, %c}\n", b.x, b.y, b.z);
+
+    character hansolo;
+    hansolo.name = "Han Solo";
+    hansolo.isrobot = 0;
+    hansolo.personality = "wandering space cowboy";
+
+    character r2d2;
+    r2d2.name = "R2D2";
+    r2d2.isrobot = 1;
+    r2d2.firmware_version = 5;
+
+    print_character(&hansolo);
+    print_character(&r2d2);
+
+
+}
