@@ -180,16 +180,16 @@ int can_transition(EntityState from, EntityState to)
 void set_state(Entity *e, EntityState to)
 {
     int legal_transition = can_transition(e->state, to);
-    if(legal_transition == 1)
+    if(legal_transition == TRANS_OK)
     {
         printf("DEBUG: Legal transtition between states.\n");
         e->state = to;
     }
-    else if(legal_transition == 0)
+    else if(legal_transition == TRANS_ILLEGAL)
     {
         printf("DEBUG: Not a legal transition. No change made.\n");
     }
-    else if(legal_transition == 2)
+    else if(legal_transition == TRANS_SAME)
     {
         printf("DEBUG: Entity is already in the requested state.\n");
     } 
