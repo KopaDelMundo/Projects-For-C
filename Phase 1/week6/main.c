@@ -1,6 +1,9 @@
 #include <stdio.h>
 
 //--------------data--------------
+
+typedef enum { TRANS_ILLEGAL, TRANS_OK, TRANS_SAME } TransitionResult;
+
 typedef struct {
     float x, y;
 } Vector2;
@@ -108,7 +111,7 @@ int main(void)
     print_entity(&e1);
     set_state(&e1, STATE_HURT);
     print_entity(&e1);
-    printf("---ENTITY 2 TESTING---");
+    printf("---ENTITY 2 TESTING---\n");
     entity_take_damage(&e2, 500);
     print_entity(&e2);
     entity_take_damage(&e2, 500);
@@ -121,7 +124,7 @@ void print_entity(const Entity *e)
 {
     const char* stateS = state_name(e->state);
     char sideFacing;
-    if(e->facing == 0)
+    if(e->facing < 0)
     {
         sideFacing = 'L';
     }
@@ -129,12 +132,12 @@ void print_entity(const Entity *e)
     {
         sideFacing = 'R';
     }
-    printf("Entity: hp %d/%d | pos(%f, %f) | facing %c |  %s\n", e->hp, e->max_hp, e->pos.x, e->pos.y, sideFacing, stateS);
+    printf("Entity: hp %d/%d | pos(%f, %.1f) | facing %c |  %s\n", e->hp, e->max_hp, e->pos.x, e->pos.y, sideFacing, stateS);
 }
 
 const char* state_name( EntityState s)
 {
-    char* stringToReturn;
+    const char* stringToReturn;
     switch (s) {
         case STATE_IDLE:
             stringToReturn = "STATE_IDLE";
@@ -161,15 +164,15 @@ const char* state_name( EntityState s)
 
 int can_transition(EntityState from, EntityState to)
 {
-    //Table answers "can [col] transiton to the state at [row]"
+    //Table answers "can [ROW] transiton to the state at [COL]"
     //0 means no, 1 means yes, 2 means its the same state so nothing is to be done
     //IDLE, RUN, ATTACK, HURT, DEAD (same order for columns)
     const int legal[STATE_COUNT][STATE_COUNT] = {
-        {2, 1, 1, 1, 0},
-        {1, 2, 1, 0, 0},
-        {1, 1, 2, 1, 0},
-        {1, 1, 0, 2, 1},
-        {0, 0, 0, 0, 2}
+        {TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_OK, TRANS_ILLEGAL},
+        {TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_ILLEGAL},
+        {TRANS_OK, TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_ILLEGAL},
+        {TRANS_OK, TRANS_OK, TRANS_ILLEGAL, TRANS_SAME, TRANS_OK},
+        {TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_SAME}
     }; 
     printf("DEBUG: legal[%d][%d] = %d\n", from, to, legal[from][to]);
     return legal[from][to];
@@ -203,6 +206,7 @@ void entity_take_damage(Entity *e, int dmg)
     }
     if(e->hp <= 0)
     {
+        e->hp = 0;
         set_state(e, STATE_DEAD);
     }
 }
