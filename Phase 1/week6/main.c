@@ -165,14 +165,13 @@ const char* state_name( EntityState s)
 int can_transition(EntityState from, EntityState to)
 {
     //Table answers "can [ROW] transiton to the state at [COL]"
-    //0 means no, 1 means yes, 2 means its the same state so nothing is to be done
-    //IDLE, RUN, ATTACK, HURT, DEAD (same order for columns)
     const int legal[STATE_COUNT][STATE_COUNT] = {
-        {TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_OK, TRANS_ILLEGAL},
-        {TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_ILLEGAL},
-        {TRANS_OK, TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_ILLEGAL},
-        {TRANS_OK, TRANS_OK, TRANS_ILLEGAL, TRANS_SAME, TRANS_OK},
-        {TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_SAME}
+                    //IDLE -- RUN -- ATTACK -- HURT -- DEAD
+        /*IDLE*/    {TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_OK, TRANS_ILLEGAL}, 
+        /*RUN*/     {TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_ILLEGAL},
+        /*ATTACK*/  {TRANS_OK, TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_ILLEGAL},
+        /*HURT*/    {TRANS_OK, TRANS_OK, TRANS_ILLEGAL, TRANS_SAME, TRANS_OK},
+        /*DEAD*/    {TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_ILLEGAL, TRANS_SAME}
     }; 
     printf("DEBUG: legal[%d][%d] = %d\n", from, to, legal[from][to]);
     return legal[from][to];
