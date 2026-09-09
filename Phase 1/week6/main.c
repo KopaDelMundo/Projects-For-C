@@ -23,23 +23,15 @@ typedef struct {
 } AnimationClip;
 
 typedef struct {
-    Vector2 pos, vel;
-    int hp, max_hp;
-    int facing;
-    EntityState state;
-} Entity;
-
-typedef struct {
     int speed;
 } ProjectileData;
 
 typedef struct {
-    int amount;
-    char *itemName;
+    char itemName[32];
 } PickupData;
 
 typedef struct {
-    char *npcName;
+    char npcName[20];
 } NpcData;
 
 typedef enum {
@@ -57,8 +49,16 @@ typedef struct {
     } data;
 } EntityExtra;
 
+typedef struct {
+    Vector2 pos, vel;
+    int hp, max_hp;
+    int facing;
+    EntityState state;
+    EntityExtra type_of_entity;
+} Entity;
+
 //--------------function prototypes--------------
-int can_transition(EntityState from, EntityState to);   //handles rules of transitioning states (eg you can't leave state_dead)
+TransitionResult can_transition(EntityState from, EntityState to);   //handles rules of transitioning states (eg you can't leave state_dead)
 void set_state(Entity *e, EntityState to);              //transitions only if can_transition allows
 void entity_take_damage(Entity *e, int dmg);            //subtracts hp, forces state_hurt (or state_dead at 0 hp)
 void print_entity(const Entity *e);                     //one line status (const reading only)
@@ -78,7 +78,13 @@ int main(void)
         .hp=1000,
         .max_hp=1000,
         .facing=1,
-        .state=STATE_IDLE
+        .state=STATE_IDLE,
+        .type_of_entity = {
+            .kind=KIND_NPC,
+            .data = {
+                .npc = { .npcName = "Hero"}
+            }
+        } 
     };
 
     Entity e2 = {
@@ -94,6 +100,27 @@ int main(void)
         .max_hp=1000,
         .facing=1,
         .state=STATE_IDLE
+    };
+
+       Entity e3 = {
+        .pos={
+            .x=200,
+            .y=200,
+        },
+        .vel={
+            .x=0,
+            .y=0
+        },
+        .hp=1000,
+        .max_hp=1000,
+        .facing=1,
+        .state=STATE_IDLE,
+        .type_of_entity = {
+            .kind = KIND_PROJECTILE,
+            .data = {
+                .proj = { .speed = 120 }
+            }
+        }
     };
 
     print_entity(&e1);
@@ -118,6 +145,9 @@ int main(void)
     print_entity(&e2);
     entity_take_damage(&e2, 500);
     print_entity(&e2);
+
+    printf("---ENTITY UNION TESTING---\n");
+    print_entity(&e3);
 }
 
 void print_entity(const Entity *e)
@@ -132,7 +162,15 @@ void print_entity(const Entity *e)
     {
         sideFacing = 'R';
     }
-    printf("Entity: hp %d/%d | pos(%f, %.1f) | facing %c |  %s\n", e->hp, e->max_hp, e->pos.x, e->pos.y, sideFacing, stateS);
+    printf("Entity: hp %d/%d | pos(%.f, %.1f) | facing %c | %s\n", e->hp, e->max_hp, e->pos.x, e->pos.y, sideFacing, stateS);
+    if(e->type_of_entity.kind == KIND_NPC)
+    {
+        printf("Name: %s\n", e->type_of_entity.data.npc.npcName);
+    }
+    else if(e->type_of_entity.kind == KIND_PROJECTILE)
+    {
+        printf("Projectile speed: %d mph\n", e->type_of_entity.data.proj.speed);
+    } 
 }
 
 const char* state_name( EntityState s)
@@ -140,19 +178,19 @@ const char* state_name( EntityState s)
     const char* stringToReturn;
     switch (s) {
         case STATE_IDLE:
-            stringToReturn = "STATE_IDLE";
+            stringToReturn = "IDLE";
             break;
         case STATE_RUN:
-            stringToReturn = "STATE_RUN";
+            stringToReturn = "RUN";
             break;
         case STATE_ATTACK:
-            stringToReturn = "STATE_ATTACK";
+            stringToReturn = "ATTACK";
             break;
         case STATE_HURT:
-            stringToReturn = "STATE_HURT";
+            stringToReturn = "HURT";
             break;
         case STATE_DEAD:
-            stringToReturn = "STATE_DEAD";
+            stringToReturn = "DEAD";
             break;
         default:
             stringToReturn = "Invalid";
@@ -162,10 +200,10 @@ const char* state_name( EntityState s)
     return stringToReturn;
 }
 
-int can_transition(EntityState from, EntityState to)
+TransitionResult can_transition(EntityState from, EntityState to)
 {
     //Table answers "can [ROW] transiton to the state at [COL]"
-    const int legal[STATE_COUNT][STATE_COUNT] = {
+    const TransitionResult legal[STATE_COUNT][STATE_COUNT] = {
                     //IDLE -- RUN -- ATTACK -- HURT -- DEAD
         /*IDLE*/    {TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_OK, TRANS_ILLEGAL}, 
         /*RUN*/     {TRANS_OK, TRANS_SAME, TRANS_OK, TRANS_OK, TRANS_ILLEGAL},
@@ -179,10 +217,13 @@ int can_transition(EntityState from, EntityState to)
 
 void set_state(Entity *e, EntityState to)
 {
+    const char* fromState = state_name(e->state);
+    const char* toState = state_name(to);
     int legal_transition = can_transition(e->state, to);
     if(legal_transition == TRANS_OK)
     {
         printf("DEBUG: Legal transtition between states.\n");
+        printf("%s -> %s\n", fromState, toState);
         e->state = to;
     }
     else if(legal_transition == TRANS_ILLEGAL)
