@@ -1,34 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-const char *messages[] ={
-    "Not a party, you are alone.",
-    "One is the loneliest number.",
-    "Not lonely, but not a party.",
-    "Now we're talking.",
-    "Now we're talking.",
-    "Now we're talking.",
-    "This is a real party",
-    "This is a real party",
-    "This is a real party",
-    "I think we violated fire code..."
-};
-
-const int NUM_MESSAGES = (sizeof(messages) / sizeof(char*));
-
-void print_party_size_info(size_t people)
-{
-    if(people > NUM_MESSAGES - 1)
-    {
-        printf("%s\n", messages[NUM_MESSAGES-1]);
-    } 
-    printf("%s\n", messages[people]);
-}
 
 int main(void)
 {
-    for(int i = 0; i < NUM_MESSAGES; i++)
-    {
-        print_party_size_info(i);
-    }
-}
 
+
+
+}

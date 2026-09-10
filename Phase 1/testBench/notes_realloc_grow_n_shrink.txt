@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+    //read a line of arbitrary size from a file
+    //
+    //returns a pointer to the line
+    //returns NULL on EOF or error
+    //
+    //its up to the caller to free() this pointer when done with it
+    //note that this strups the newline from the result. If you need it in there
+    //its best to switch this to a do while
+
+char *readline(FILE *fp)
+{
+    int offset = 0;     //index next char goes in the buffer
+    int bufsize = 4;    //preferably power of 2 initial size
+    char *buf;          //the buffer
+    int c;              //the character we've read in
+
+    buf = malloc(bufsize);
+
+    if (buf == NULL) //error check
+        return NULL;
+
+    while (c = fgetc(fp), c != '\n' && c != EOF)
+    {
+        //check if we're out of room in the buffer accounting
+        //for the extra byte for the NUL terminator
+        if (offset == bufsize -1) { // -1 for the NUL terminator
+            bufsize *= 2; // 2x the space
+
+            char *new_buff = realloc(buf, bufsize);
+
+            if(new_buff == NULL){
+                free(buf); //on error, free and bail
+                return NULL;
+            }
+
+            buf = new_buff; //successful realloc
+        }
+
+        buf[offset++] = c; //add the byte onto the buffer
+    }
+
+    //we hit newline of EOF
+
+    //if at EOF and we read no bytes, free the buffer and 
+    //return NULL to indicate we're at EOF
+    if(c == EOF && offset == 0){
+        free(buf);
+        return NULL;
+    }
+
+    //Shrink to fit
+    if (offset < bufsize - 1) { //if we're on the short of the end
+        char *new_buff = realloc(buf, offset + 1); //plus 1 for NULL terminator
+
+        //if successful, point buf to new_buf;
+        //otherwise we'll just leave buf where it is
+        if (new_buff != NULL)
+            buf = new_buff;
+    }
+
+    //add the NULL operator
+    buf[offset] = '\0';
+    
+    return buf;
+}
+int main(void)
+{
+
+    FILE *fp = fopen("foo.txt", "r");
+
+    char *line;
+
+    while((line = readline(fp)) != NULL){
+        printf("%s\n", line);
+        free(line);
+    }
+
+    fclose(fp);
+
+}
