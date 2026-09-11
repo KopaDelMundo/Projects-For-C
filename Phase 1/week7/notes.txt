@@ -1,0 +1,12 @@
+void da_push(DynArray *a, Entity *e)
+{
+    //a->count++;
+    if(a->count >= a->capacity)
+    {
+        a->capacity *= 2;
+        a->items = realloc(a->items, sizeof(Entity) * a->capacity);
+    }
+
+    a->items[a->count] = *e;
+
+}

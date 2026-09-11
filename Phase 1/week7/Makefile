@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -g -Wstrict-prototypes
+CFLAGS = -Wall -Wextra -Wstrict-prototypes -g
 
 main: main.c
 	clang $(CFLAGS) -o main main.c
