@@ -100,9 +100,17 @@ void da_remove_swap(DynArray *a, int num)
     else
     {
         a->items[num] = a->items[a->count - 1];
-        if(a->count < a->capacity / 2)
+        if(a->count < a->capacity / 2 && a->capacity % 10 == 0)
         {
-            a->capacity /= 2;
+            if(a->capacity < 10)
+            {
+                a->capacity = 10;
+            }
+            else
+            {
+                a->capacity /= 2;
+            }
+            
             a->items = realloc(a->items, sizeof(Entity) * a->capacity);
         }
         a->count -= 1;
