@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BASE_CAP 10;
+
+//TODO: 
+
 typedef struct {
     int itemNum;
 } Entity;
@@ -32,13 +36,19 @@ int main(void)
     da_push(&dy1, &e2);
     da_push(&dy1, &e3);
     da_push(&dy1, &e4);
+    da_push(&dy1, &e5);
 
     
 
-    Entity *p = da_get(&dy1, 0);
+    //Entity *p = da_get(&dy1, 0);
 
-    printf("Item Number %d\n", dy1.items->itemNum);
-    printf("Address of previous item: %p\n", p);
+    print_DynArray(&dy1);
+
+    da_remove_swap(&dy1, 0);
+    printf("----------------------------------------\n");
+    printf("----------------------------------------\n");
+    
+    print_DynArray(&dy1);
 
     free(dy1.items);
     
@@ -89,7 +99,7 @@ void da_remove_swap(DynArray *a, int num)
     }
     else
     {
-        a->items[num] = a->items[a->count - 0];
+        a->items[num] = a->items[a->count - 1];
         if(a->count < a->capacity / 2)
         {
             a->capacity /= 2;
@@ -101,13 +111,17 @@ void da_remove_swap(DynArray *a, int num)
 
 void print_DynArray(DynArray *a)
 {
-    Entity *p;
-
     for(int i = 0; i < a->count; i++)
     {
-        p =  
+         
         printf("----------------------------------------\n");
-        printf("Entity Number %d: %d \n", i, a->items->itemNum);
-        printf()
+        printf("Entity: %d \n", a->items[i].itemNum);
+        printf("----------------------------------------\n");
     }
+}
+
+void da_free(DynArray *a)
+{
+    a->items[0].itemNum = 0;
+    a->capacity = BASE_CAP;
 }
