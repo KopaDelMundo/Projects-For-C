@@ -17,14 +17,21 @@ void da_push(DynArray *a, Entity *e);      //append; grow (double capacity via r
 Entity *da_get(DynArray *a, int i);        //bounds-checked pointer to element i (or NULL)
 void da_remove_swap(DynArray *a, int num); //O(1) removal wwhen order doesn't matter (games don't care) overwrite slot i with the last element, decrement count. Edge case: removing the last element.                                    
 void da_free(DynArray *a);                 //free and zero it out
-
+void print_DynArray(DynArray *a);
 
 int main(void)
 {
     DynArray dy1;
     da_init(&dy1);
     Entity e1 = { 1 };
+    Entity e2 = { 2 };
+    Entity e3 = { 3 };
+    Entity e4 = { 4 };
+    Entity e5 = { 5 };
     da_push(&dy1, &e1);
+    da_push(&dy1, &e2);
+    da_push(&dy1, &e3);
+    da_push(&dy1, &e4);
 
     
 
@@ -82,6 +89,25 @@ void da_remove_swap(DynArray *a, int num)
     }
     else
     {
-        
+        a->items[num] = a->items[a->count - 0];
+        if(a->count < a->capacity / 2)
+        {
+            a->capacity /= 2;
+            a->items = realloc(a->items, sizeof(Entity) * a->capacity);
+        }
+        a->count -= 1;
+    }
+}
+
+void print_DynArray(DynArray *a)
+{
+    Entity *p;
+
+    for(int i = 0; i < a->count; i++)
+    {
+        p =  
+        printf("----------------------------------------\n");
+        printf("Entity Number %d: %d \n", i, a->items->itemNum);
+        printf()
     }
 }
