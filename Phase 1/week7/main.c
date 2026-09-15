@@ -20,10 +20,11 @@ void da_init(DynArray *a);                 //start empty (capacity at 0 or small
 void da_push(DynArray *a, Entity *e);      //append; grow (double capacity via realloc) when full
 Entity *da_get(DynArray *a, int i);        //bounds-checked pointer to element i (or NULL)
 void da_remove_swap(DynArray *a, int num); //O(1) removal wwhen order doesn't matter (games don't care) overwrite slot i with the last element, decrement count. Edge case: removing the last element.                                    
-void da_free(DynArray *a);                 //free and zero it out
+void da_free(DynArray *a);
+void da_clear(DynArray *a);                 //free and zero it out
 void print_DynArray(DynArray *a);
 
-int main(void)
+int main(void) 
 {
     DynArray dy1;
     da_init(&dy1);
@@ -73,11 +74,11 @@ int main(void)
     
     print_DynArray(&dy1);
 
-    da_free(&dy1);
+    da_clear(&dy1);
 
     print_DynArray(&dy1);
 
-    free(dy1.items);
+    da_free(&dy1);
 }
 
 void da_init(DynArray *a)
@@ -112,7 +113,7 @@ void da_push(DynArray *a, Entity *e)
 Entity *da_get(DynArray *a, int i)
 {
     Entity *p = NULL;
-    if(i > a->capacity - 1)
+    if(i < 0 || i > a->count - 1)
     {
         printf("Selection was out of bounds.");
     }
@@ -176,10 +177,18 @@ void print_DynArray(DynArray *a)
     printf("Current Capacity: %d\n", a->capacity);
 }
 
-void da_free(DynArray *a)
+void da_clear(DynArray *a)
 {
     printf("Clearing out dynamic array...\n");
     a->items[0].itemNum = 0;
     a->capacity = BASE_CAP;
     a->count = 0;
+}
+
+void da_free(DynArray *a)
+{
+    free(a->items);
+    a->items = NULL;
+    a->count = 0;
+    a->capacity = 0;
 }
