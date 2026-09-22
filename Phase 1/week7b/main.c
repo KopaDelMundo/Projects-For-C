@@ -19,12 +19,20 @@ typedef struct {
 
 typedef struct {
     projectile items[POOL_SIZE];
-} Porj_Pool;
+} Proj_Pool;
 
 void pool_spawn(projectile pool);
 void pool_update(projectile pool);
 
 int main(void)
 {
-    
+    Proj_Pool bullet_pool = { };
+}
+
+void pool_spawn(projectile pool)
+{
+    for(int i = 0; i < POOL_SIZE; i++)
+    {
+
+    }
 }
