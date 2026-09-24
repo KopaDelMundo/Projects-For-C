@@ -1,0 +1,16 @@
+        if(spawnResult1 == -1)
+        {
+            printf("Looks like the pool is full.\n");
+        }
+        else
+        {
+            printf("Status of entity at indices %d is... ", i);
+            if(bullet_pool.items[i].active_state == ACTIVE)
+            {
+                printf("active\n");
+            }
+            else
+            {
+                printf("inactive (did something go wrong?)\n");
+            }
+        }
