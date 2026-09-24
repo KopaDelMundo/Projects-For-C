@@ -33,7 +33,7 @@ int main(void)
     int spawnResult1;
     Vector2 testpos = {0,0};
     Vector2 testvel = {1,1};
-    int lifetime = 3;
+    int lifetime = 2;
 
     //spawnResult1
 
@@ -62,7 +62,7 @@ int pool_spawn(Proj_Pool *p, Vector2 pos, Vector2 vel, int lifetime)
             p->items[i].vel           = vel;
             p->items[i].lifetime      = lifetime;
             p->items[i].active_state  = ACTIVE;
-            return 1;
+            return i;
         }
     }
     
@@ -73,12 +73,12 @@ void pool_update(Proj_Pool *p)
 {
     for(int i = 0; i < POOL_SIZE; i++)
     {
-        if(p->items[i].active_state == 1)
+        if(p->items[i].active_state == ACTIVE)
         {
             p->items[i].pos.x       += p->items[i].vel.x;
             p->items[i].pos.y       += p->items[i].vel.y;
             p->items[i].lifetime    -= 1;
-            if(p->items[i].lifetime == 0)
+            if(p->items[i].lifetime <= 0)
             {
                 p->items[i].active_state = INACTIVE;
             }
@@ -96,6 +96,8 @@ void init_pool(Proj_Pool *p)
 
 void print_entity(Proj_Pool *p, int index)
 {
+    if(index < 0 || index >= POOL_SIZE) return;
+
     printf("Entity at Index: %d\n", index);
     printf("Active status: %d\n", p->items[index].active_state);
     printf("Lifetime: %d\n", p->items[index].lifetime);
