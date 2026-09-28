@@ -1,29 +1,20 @@
 #include <stdio.h>
-#include <stdlib.h>
-
-typedef struct{
-    int x;
-    int y;
-} Point;
 
 int main(void)
 {
+    FILE *fp;
+    unsigned char c;
 
-    int length = 3;
-    Point *array;
-    array = malloc(sizeof(Point) * length);
+    fp = fopen("output.bin", "wb");     //wb mode for write binary
 
-    array[0].x = 1;
-    array[0].y = 1;
+    // In the call to fwrite, the arguments are:
+    //
+    // * Pointer to data to write
+    // * Size of each "piece" of data
+    // * Count of each "piece" of data
+    // * FILE*
 
-    //free(array);
+    fwrite(bytes, sizeof(char), 6, fp);
 
-    length = 4;
-
-    array = realloc(array, sizeof(Point) * length);
-
-    array[3].x = 1;
-    array[3].y = 1;
-
-    free(array);
+    fclose(fp);
 }
