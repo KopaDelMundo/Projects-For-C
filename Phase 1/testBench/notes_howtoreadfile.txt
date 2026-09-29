@@ -53,3 +53,25 @@ binary write
     fwrite(bytes, sizeof(char), 6, fp);
 
     fclose(fp);
+
+
+binary read
+
+#include <stdio.h>
+
+int main(void)
+{
+    FILE *fp;
+    unsigned char c;
+
+    fp = fopen("output.bin", "rb"); //rb for "read binary"
+
+    while (fread(&c, sizeof(char), 1, fp) > 0)
+    {
+        printf("%d\n", c);
+    }
+
+    fclose(fp);
+}
+//appears as ints because we are asking them to be read as such in printf()
+
