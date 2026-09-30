@@ -2,7 +2,7 @@
 #include "entity.h"
 #include "dynarray.h"
 
-
+//TODO: Continue work on load_game()
 
 typedef struct {
     char* playerName;
@@ -59,7 +59,7 @@ int load_game(const char *path, DynArray *entites, Player *p)
     fp = fopen("save.txt", "r");
     while(fscanf(fp, "%s %d", name, &id) != EOF)
     {
-        
+
     }
 
 }
