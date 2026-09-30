@@ -3,6 +3,7 @@
 
 typedef struct {
     int itemNum;
+    char* itemName;
 } Entity;
 
 #endif
