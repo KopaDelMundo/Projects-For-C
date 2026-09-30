@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include "dynarray.h"
 #define BASE_CAP 10
 
 void da_init(DynArray *a)

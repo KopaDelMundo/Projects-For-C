@@ -1,7 +1,14 @@
+#include "entity.h"
 #ifndef DYNARRAY_H
 #define DYNARRAY_H
 
+
 //File dynarray.h
+typedef struct {
+    Entity *items;
+    int count; //amount of items 
+    int capacity; //max number of items
+} DynArray;
 
 void da_init(DynArray *a);                 //start empty (capacity at 0 or small default)
 void da_push(DynArray *a, Entity *e);      //append; grow (double capacity via realloc) when full
