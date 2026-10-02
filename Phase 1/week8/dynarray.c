@@ -92,7 +92,8 @@ void print_DynArray(DynArray *a)
     {
          
         printf("----------------------------------------\n");
-        printf("Entity: %d \n", a->items[i].itemNum);
+        printf("Entity ID: %d \n", a->items[i].itemNum);
+        printf("Entity Name: %s \n", a->items[i].itemName);
         printf("----------------------------------------\n");
     }
     printf("Current Count: %d\n", a->count);

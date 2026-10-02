@@ -1,6 +1,4 @@
-The items of player Xeno Humphrey:
-Entity ID: 1
-Entity ID: 2
-Entity ID: 3
-Entity ID: 4
-Entity ID: 5
+sword 5
+axe 2
+potion 3
+elixir 33
