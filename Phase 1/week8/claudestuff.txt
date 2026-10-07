@@ -1,28 +1,54 @@
-fscanf isn't the problem. It's reading "sword" into name correctly. The bug is what line 57 does with it.
+fscanf isn't the problem. It's reading "sword" into name correctly. 
+The bug is what line 57 does with it.
 
 What line 57 actually does
 
-itemName is a char* (entity.h), so entities->items[count].itemName = name; doesn't copy any characters. It copies an address. name is an array, and in that expression it decays to a pointer to its first byte. So every entity ends up holding the same address: the start of the one name buffer.
+itemName is a char* (entity.h), so entities->items[count].itemName = name; 
+doesn't copy any characters. It copies an address. name is an array, and in 
+that expression it decays to a pointer to its first byte. So every entity ends 
+up holding the same address: the start of the one name buffer.
 
 That causes two problems, one stacked on the other:
 
-They all share one buffer. Each loop pass, fscanf overwrites name. If the program stopped there, every entity would show the last name read ("elixir").
-The buffer stops existing. name is a local variable inside load_game, so it lives on the stack only while that function runs. When load_game returns, every entity holds a pointer into memory that's no longer reserved. print_DynArray then calls other functions that reuse that stack space, and %s prints whatever bytes happen to be there. That's the garbage you see.
+They all share one buffer. Each loop pass, fscanf overwrites name. If the 
+program stopped there, every entity would show the last name read ("elixir").
+The buffer stops existing. name is a local variable inside load_game, 
+so it lives on the stack only while that function runs. When load_game returns, 
+every entity holds a pointer into memory that's no longer reserved. print_DynArray 
+then calls other functions that reuse that stack space, and %s prints whatever bytes 
+happen to be there. That's the garbage you see.
 Why a string literal "works"
 
-"sword" isn't stored on the stack. String literals have static storage duration: they exist at a fixed address for the whole program run. Pointing at one is always valid, so the same assignment looks fine. That's why the bug only shows up with name.
+"sword" isn't stored on the stack. String literals have static storage 
+duration: they exist at a fixed address for the whole program run. 
+Pointing at one is always valid, so the same assignment looks fine. 
+That's why the bug only shows up with name.
 
 The general principle
 
-When a struct has a pointer field, assigning to it doesn't put data in the struct. It only records where the data lives somewhere else. So for every pointer you store, ask: who owns the memory it points at, and does that memory live at least as long as the struct? Here the answer is "a local array that dies when the function returns," which is too short. There are two usual ways out:
+When a struct has a pointer field, assigning to it doesn't put data in the 
+struct. It only records where the data lives somewhere else. So for every pointer 
+you store, ask: who owns the memory it points at, and does that memory live at 
+least as long as the struct? Here the answer is "a local array that dies when the 
+function returns," which is too short. There are two usual ways out:
 
 give each entity its own heap copy of the string, or
 change the struct so the characters live inside it (an array field instead of a pointer).
-Each choice affects other code. With heap copies, da_free/da_clear/da_remove_swap have to free those strings too. With an array field, you need a maximum name length, and fscanf has to be stopped from writing past it. Your 64-byte name has that same overflow risk today with a bare %s.
+Each choice affects other code. With heap copies, 
+da_free/da_clear/da_remove_swap have to free those strings too. 
+With an array field, you need a maximum name length, 
+and fscanf has to be stopped from writing past it. 
+Your 64-byte name has that same overflow risk today with a bare %s.
 
 Other things in load_game, most serious first
 
-No capacity check. It writes to items[count] directly instead of going through da_push, so the growth logic never runs. A save file with more lines than the starting capacity writes past the end of the heap allocation. That's the same "rule in one function, bypassed in its sibling" pattern as before.
-The loop condition only checks for EOF. fscanf returns how many fields it filled in. A malformed line (for example, a name with no number) returns 0 or 1, not EOF, so the loop keeps going with stale id/name values, or loops forever.
+No capacity check. It writes to items[count] directly instead of going through da_push, 
+so the growth logic never runs. A save file with more lines than the starting capacity writes 
+past the end of the heap allocation. That's the same "rule in one function, bypassed in its sibling" 
+pattern as before.
+The loop condition only checks for EOF. fscanf returns how many fields it filled in. 
+A malformed line (for example, a name with no number) returns 0 or 1, not EOF, 
+so the loop keeps going with stale id/name values, or loops forever.
 No checks on the file. fopen isn't checked for NULL, and fp is never closed.
-da_clear at the top. This is the known issue from week 7. It's fine here because da_init ran first, but it'll crash if load_game is ever called on a freed array.
+da_clear at the top. This is the known issue from week 7. 
+It's fine here because da_init ran first, but it'll crash if load_game is ever called on a freed array.

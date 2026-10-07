@@ -10,6 +10,8 @@ typedef struct {
     int capacity; //max number of items
 } DynArray;
 
+
+
 void da_init(DynArray *a);                 //start empty (capacity at 0 or small default)
 void da_push(DynArray *a, Entity *e);      //append; grow (double capacity via realloc) when full
 Entity *da_get(DynArray *a, int i);        //bounds-checked pointer to element i (or NULL)

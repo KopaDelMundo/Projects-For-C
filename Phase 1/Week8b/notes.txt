@@ -1,0 +1,56 @@
+int try_move(char map[MAX_ROW][MAX_COL], int *row, int *col, char dir, int lengthwidth[2]) 
+{
+    int success = 0;
+    switch(dir)
+    {
+        case 'w':
+            if ((*row-1) >= 0 && map[*row-1][*col] == '.')
+            {
+                *row -= 1;
+                success = 1;
+            }
+            else
+            {
+                printf("WALL IN WAY\n");
+            }
+            break;
+        case 'a':
+            if ((*col-1) >= 0 && map[*row][*col-1] == '.')
+            {
+                *col -= 1;
+                success = 1;
+            }
+            else
+            {
+                printf("WALL IN WAY\n");
+            }
+            break;
+        case 's':
+            if ((*row+1) < ROWS && map[*row+1][*col] == '.' )
+            {
+                *row += 1;
+                success = 1;
+            }
+            else
+            {
+                printf("WALL IN WAY\n");
+            }
+            break;
+        case 'd':
+            if ((*col+1) < COLS && map[*row][*col+1] == '.')
+            {
+                *col += 1;
+                success = 1;
+            }
+            else
+            {
+                printf("WALL IN WAY\n");
+            }
+            break;
+           case 'q':
+            break; 
+        default:
+            printf("Unknown key\n");
+    }
+    return success;
+}

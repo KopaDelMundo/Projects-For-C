@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "entity.h"
 #include "dynarray.h"
 
@@ -54,7 +55,7 @@ int load_game(const char *path, DynArray *entities)
     fp = fopen(path, "r");
     while(fscanf(fp,"%s %d", name, &id) != EOF)
     {
-        entities->items[count].itemName = name;
+        strncpy(entities->items[count].itemName, name, sizeof(entities->items[count].itemName) - 1);
         entities->items[count].itemNum = id;
         entities->count += 1;
         count++;

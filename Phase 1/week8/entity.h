@@ -3,7 +3,7 @@
 
 typedef struct {
     int itemNum;
-    char* itemName;
+    char itemName[1024];
 } Entity;
 
 #endif
