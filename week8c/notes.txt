@@ -1,0 +1,18 @@
+void event_queue_init(EventQueue *q); // empty
+
+int event_schedule(EventQueue *q, int delay, EventKind kind, int arg); 
+/*appends a new node at the tail (so list order is scheduling order). 
+A delay below 1 is treated as 1. Returns 1, or 0 if allocation fails*/ 
+
+int event_tick(EventQueue *q, EventHandler handler, void *ctx); 
+//every event present at the start of the call is decreased by one 
+//those that reach 0 are unlinked, then fired in list order by calling handler(), then freed.
+//events the handler schedules during this call are appended but not decremented until the next call
+//returns the number fired 
+//handler may be NULL (Events are still removed)
+
+int event_count(const EventQueue *q); //pending events
+
+const char *event_kind_name(EventKind k); //"SPAWN_WAVE", "HEAL_PULSE", "MESSAGE", OR "?"
+
+void event_queue_free(EventQueue *q) //frees every node back to init state; safe twice
