@@ -26,6 +26,7 @@ int event_schedule(EventQueue *q, int delay, EventKind kind, int arg)
     return 1;
 
 } 
+
 void event_count(const EventQueue *q)
 {
     Event *temp = q->head;
@@ -42,7 +43,21 @@ void event_count(const EventQueue *q)
     }
 }
 
-int event_tick(EventQueue *q, EventHandler handler, void *ctx); 
+int event_tick(EventQueue *q, EventHandler handler, void *ctx)
+{
+    Event *prev_event = NULL;
+    Event *temp = q->head;
+    while(temp != NULL)
+    {
+
+        if(temp->ticks_remaining == 0)
+        {
+
+        }
+        prev_event = temp;
+        temp = temp->next;
+    }
+} 
 
 const char *event_kind_name(EventKind k);
 

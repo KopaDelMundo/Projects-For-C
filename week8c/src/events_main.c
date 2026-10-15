@@ -12,5 +12,11 @@ int main(void)
     event_count(&events);
 
     event_queue_free(&events);
+  
+}
 
+static void on_event(EventKind kind, int arg, void *ctx)
+{
+    EventQueue *q = ctx;
+    
 }

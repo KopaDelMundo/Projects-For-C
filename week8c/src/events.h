@@ -20,6 +20,11 @@ typedef struct {
     int count;
 } EventQueue;
 
+typedef struct {
+    EventQueue *q; 
+    int tick;
+} EventsCtx;
+
 typedef void (*EventHandler) (EventKind kind, int arg, void *ctx);
 
 void event_queue_init(EventQueue *q); // empty
