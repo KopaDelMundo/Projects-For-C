@@ -7,6 +7,7 @@ void event_queue_init(EventQueue *q) //initialize linked list
     q->head = NULL;
     q->count = 0;
 }
+
 int event_schedule(EventQueue *q, int delay, EventKind kind, int arg)
 {
     Event *temp = malloc(sizeof(Event));
@@ -46,20 +47,28 @@ void event_count(const EventQueue *q)
 int event_tick(EventQueue *q, EventHandler handler, void *ctx)
 {
     Event *prev_event = NULL;
-    Event *temp = q->head;
-    while(temp != NULL)
+    Event *ptr = q->head;
+    while(ptr != NULL)
     {
 
-        if(temp->ticks_remaining == 0)
+        if(ptr->ticks_remaining == 0)
         {
+            //fire event here
 
+            //free event node//
+            //set the pointer to the previous event to point to one after ptr
+            prev_event->next = ptr->next;  
+            free(ptr);
+            ptr = prev_event->next;
         }
-        prev_event = temp;
-        temp = temp->next;
+        else
+        {
+            prev_event = ptr;
+            ptr = ptr->next;
+        }
+        
     }
 } 
-
-const char *event_kind_name(EventKind k);
 
 void event_queue_free(EventQueue *q)
 {
@@ -72,3 +81,5 @@ void event_queue_free(EventQueue *q)
     }
     printf("Linked list has been cleared\n");
 } 
+
+const char *event_kind_name(EventKind k);
