@@ -50,13 +50,12 @@ int event_tick(EventQueue *q, EventHandler handler, void *ctx)
     Event *ptr = q->head;
     while(ptr != NULL)
     {
-
         if(ptr->ticks_remaining == 0)
         {
             //fire event here
-
+            handler(ptr->kind, ptr->arg, ctx);
             //free event node//
-            //set the pointer to the previous event to point to one after ptr
+            //set the pointer to the previous event to point to one after ptr//
             prev_event->next = ptr->next;  
             free(ptr);
             ptr = prev_event->next;
@@ -65,8 +64,7 @@ int event_tick(EventQueue *q, EventHandler handler, void *ctx)
         {
             prev_event = ptr;
             ptr = ptr->next;
-        }
-        
+        } 
     }
 } 
 
@@ -82,4 +80,26 @@ void event_queue_free(EventQueue *q)
     printf("Linked list has been cleared\n");
 } 
 
-const char *event_kind_name(EventKind k);
+const char *event_kind_name(EventKind k)
+{
+    const char* stringToReturn;
+    switch(k) {
+        case EVENT_SPAWN_WAVE:
+            stringToReturn = "SPAWN_WAVE";
+            break;
+        case EVENT_HEAL_PULSE:
+            stringToReturn = "SPAWN_WAVE";
+            break;
+        case EVENT_MESSAGE:
+            stringToReturn = "SPAWN_WAVE";
+            break;
+        case EVENT_COUNT:
+            stringToReturn = "SPAWN_WAVE";
+            break;
+        default:
+            stringToReturn = "Invalid, fix it now!!!";
+            break;
+    }
+
+    return stringToReturn;
+}
