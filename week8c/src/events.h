@@ -5,7 +5,7 @@ typedef enum {
     EVENT_SPAWN_WAVE,
     EVENT_HEAL_PULSE,
     EVENT_MESSAGE,
-    EVENT_COUNT
+    EVENT_COUNT //for doing math/keeping track of enum placement, not for anyting else
 } EventKind;
 
 typedef struct Event {
