@@ -43,7 +43,7 @@ typedef struct {
 
 } command;
 
-static void on_event(EventKind kind, int arg, void *ctx);
+//static void on_event(EventKind kind, int arg, void *ctx);
 int parse_cmd(const char* line, char numInputs[3][5]);
 int is_NotEmpty(const char* input);
 
@@ -58,7 +58,7 @@ int main(void)
     char cmd_line[33];
     //char cmd_letter;
     char cmd_num_inputs[3][5];
-    int tokens = 0;
+    //int tokens = 0;
     
     //scheduling/handling
     
@@ -92,11 +92,11 @@ int main(void)
         switch (cmd_line[0])
         {
             case 't':
-                tokens = parse_cmd(cmd_line, cmd_num_inputs);
+                parse_cmd(cmd_line, cmd_num_inputs);
                 
                 break;
             case 's':
-                tokens = parse_cmd(cmd_line, cmd_num_inputs);
+                parse_cmd(cmd_line, cmd_num_inputs);
                 break;
             case 'l':
                 event_count(&events);
@@ -121,12 +121,15 @@ int main(void)
 
 int parse_cmd(const char* line, char numInputs[3][5])
 {
-    int token_flag = 0;
-    int letter_len, num_len1, num_len2, num_len3 = 0;
-    int max_letter_len = 1;
-    int max_num_length = 4;
+    int token_flag      = 0;
+    int letter_len      = 0;
+    int num_len1        = 0;
+    int num_len2        = 0;
+    int num_len3        = 0;
+    int max_letter_len  = 1;
+    int max_num_length  = 4;
 
-    char letter;
+    char letter = '\0';
     char* firstNum = numInputs[0];
     char* secondNum = numInputs[1];
     char* thirdNum = numInputs[2];
@@ -147,7 +150,7 @@ int parse_cmd(const char* line, char numInputs[3][5])
             if(token_flag == 1 && letter_len < max_letter_len)
             {
                 letter_len++;
-                *letter = *line;
+                letter = *line;
             } 
             else if(token_flag == 2 && num_len1 < max_num_length)
             {
@@ -180,9 +183,9 @@ int parse_cmd(const char* line, char numInputs[3][5])
     *secondNum = '\0';
     *thirdNum = '\0';
 
-    if(firstNum != '\0') tokens++;
-    if(secondNum != '\0') tokens++;
-    if(thirdNum != '\0') tokens++;
+    if(*firstNum != '\0') tokens++;
+    if(*secondNum != '\0') tokens++;
+    if(*thirdNum != '\0') tokens++;
 
     return tokens;
 
