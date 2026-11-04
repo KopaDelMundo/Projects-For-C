@@ -44,7 +44,8 @@ typedef struct {
 } command;
 
 //static void on_event(EventKind kind, int arg, void *ctx);
-int parse_cmd(const char* line, char numInputs[3][5]);
+void convert_chars_to_nums(int num_of_tokens, char numInputs[3], int nums[3]);
+int parse_cmd(const char* line, char numInputs[3]);
 int is_NotEmpty(const char* input);
 
 int main(void)
@@ -56,9 +57,9 @@ int main(void)
 
     //variables for set up
     char cmd_line[33];
-    //char cmd_letter;
-    char cmd_num_inputs[3][5];
-    //int tokens = 0;
+    char cmd_num_inputs[3];
+    int cmd_num_int_inputs[3];
+    int tokens = 0;
     
     //scheduling/handling
     
@@ -92,16 +93,18 @@ int main(void)
         switch (cmd_line[0])
         {
             case 't':
-                parse_cmd(cmd_line, cmd_num_inputs);
-                
+                tokens = parse_cmd(cmd_line, cmd_num_inputs);
+                convert_chars_to_nums(tokens, cmd_num_inputs, cmd_num_int_inputs);
                 break;
             case 's':
-                parse_cmd(cmd_line, cmd_num_inputs);
+                tokens = parse_cmd(cmd_line, cmd_num_inputs);
+                convert_chars_to_nums(tokens, cmd_num_inputs, cmd_num_int_inputs);
                 break;
             case 'l':
                 event_count(&events);
                 break;
             case 'q':
+                printf("Bye!\n");
                 return 0;
                 break;
             default:
@@ -109,9 +112,7 @@ int main(void)
         }
     }
 
-    event_schedule(&events, 3, EVENT_SPAWN_WAVE, 1);
-    event_schedule(&events, 4, EVENT_HEAL_PULSE, 1);
-    event_schedule(&events, 5, EVENT_MESSAGE, 1);
+
 
     
     //free queue at end
@@ -119,7 +120,7 @@ int main(void)
   
 }
 
-int parse_cmd(const char* line, char numInputs[3][5])
+int parse_cmd(const char* line, char numInputs[3])
 {
     int token_flag      = 0;
     int letter_len      = 0;
@@ -189,6 +190,14 @@ int parse_cmd(const char* line, char numInputs[3][5])
 
     return tokens;
 
+}
+
+void convert_chars_to_nums(int num_of_tokens, char numInputs[3], int nums[3])
+{
+    for (int i = 0; i < num_of_tokens; i++)
+    {
+        nums[i] == atoi(numInputs[i]);
+    }
 }
 
 int is_NotEmpty(const char* input) 
