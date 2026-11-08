@@ -19,12 +19,7 @@ typedef struct {
 
 
 //static void on_event(EventKind kind, int arg, void *ctx);
-<<<<<<< HEAD
 int parse_cmd(const char* line, char inputs[3], int nums[3]);
-=======
-void convert_chars_to_nums(int num_of_tokens, char numInputs[3], int nums[3]);
-int parse_cmd(const char* line, char numInputs[3]);
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
 int is_NotEmpty(const char* input);
 static void on_event(EventKind kind, int arg, void *ctx);
 
@@ -38,15 +33,10 @@ int main(void)
 
     //variables for set up
     char cmd_line[33];
-<<<<<<< HEAD
     char cmd_inputs[4][5];
     int num_inputs[3] = {0};
     //t N
     //s delay eventkind arg
-=======
-    char cmd_num_inputs[3];
-    int cmd_num_int_inputs[3];
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
     int tokens = 0;
     
     //scheduling/handling
@@ -82,30 +72,16 @@ int main(void)
         switch (cmd_inputs[0][0])
         {
             case 't':
-<<<<<<< HEAD
                 event_tick(&events, handler, &context);
                 break;
             case 's':
                 event_schedule(&events, num_inputs[0], num_inputs[1], num_inputs[2]);
-=======
-                tokens = parse_cmd(cmd_line, cmd_num_inputs);
-                convert_chars_to_nums(tokens, cmd_num_inputs, cmd_num_int_inputs);
-                break;
-            case 's':
-                tokens = parse_cmd(cmd_line, cmd_num_inputs);
-                convert_chars_to_nums(tokens, cmd_num_inputs, cmd_num_int_inputs);
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
                 break;
             case 'l':
                 event_count(&events);
                 break;
             case 'q':
-<<<<<<< HEAD
                 printf("Goodbye\n");
-=======
-                printf("Bye!\n");
-                return 0;
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
                 break;
             default:
                 break;
@@ -113,10 +89,6 @@ int main(void)
         
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
 
     
     //free queue at end
@@ -125,11 +97,7 @@ int main(void)
 
 }
 
-<<<<<<< HEAD
 int parse_cmd(const char* line, char inputs[4][5], int nums[3])
-=======
-int parse_cmd(const char* line, char numInputs[3])
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
 {
     int token_flag      = 0;
     int letter_len      = 0;
@@ -207,7 +175,6 @@ int parse_cmd(const char* line, char numInputs[3])
 
 }
 
-<<<<<<< HEAD
 static void on_event(EventKind kind, int arg, void *ctx)
 {
     EventsCtx *c = ctx;
@@ -225,13 +192,6 @@ static void on_event(EventKind kind, int arg, void *ctx)
             break;
         default:
             printf("?\n");  
-=======
-void convert_chars_to_nums(int num_of_tokens, char numInputs[3], int nums[3])
-{
-    for (int i = 0; i < num_of_tokens; i++)
-    {
-        nums[i] == atoi(numInputs[i]);
->>>>>>> 587b225cdb32902efbc7c596ad6bc9001a5f7272
     }
 }
 
