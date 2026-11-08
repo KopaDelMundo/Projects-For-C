@@ -67,7 +67,7 @@ int main(void)
         cmd_line[strcspn(cmd_line, "\n")] = '\0';
 
         //input is within length parameters, now cmd must be parsed
-        tokens = parse_cmd(cmd_line, cmd_inputs, num_inputs);
+        tokens = parse_cmd(cmd_line, cmd_inputs, num_inputs); //use this to verify input later
 
         switch (cmd_inputs[0][0])
         {
