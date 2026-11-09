@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "events.h"
 
 //TODO:
 /*
     currently:
-    onEvent now needs to handle different type of events and execute as per the spec
+    ticks increasing functionality needs to be set up
+
+    basic onEvent printing is complete. Need to figure out how to get heal pulse
+    to schedule multiple events based on the arg
+
+    after:
+    run program to look for bugs / other problems
 
 */
 
@@ -19,7 +26,7 @@ typedef struct {
 
 
 //static void on_event(EventKind kind, int arg, void *ctx);
-int parse_cmd(const char* line, char inputs[3], int nums[3]);
+int parse_cmd(const char* line, char inputs[4][5], int nums[3]);
 int is_NotEmpty(const char* input);
 static void on_event(EventKind kind, int arg, void *ctx);
 
@@ -32,14 +39,10 @@ int main(void)
     EventHandler handler = on_event;
 
     //variables for set up
-    char cmd_line[33];
-    char cmd_inputs[4][5];
-    int num_inputs[3] = {0};
-    //t N
-    //s delay eventkind arg
     int tokens = 0;
-    
-    //scheduling/handling
+    char cmd_line[33]       = {0};
+    char cmd_inputs[4][5]   = {0};
+    int num_inputs[3]       = {0}; //t N //s delay eventkind arg
     
     
     while(1)
@@ -72,10 +75,34 @@ int main(void)
         switch (cmd_inputs[0][0])
         {
             case 't':
-                event_tick(&events, handler, &context);
+                if(tokens < 2)
+                {
+                    int loop_count = 0;
+                    if(tokens == 2)
+                    {
+                        loop_count = num_inputs[0];
+                    }
+                    else
+                    {
+                        loop_count = 1;
+                    }
+                    event_tick(&events, handler, &context);
+                }
+                else
+                {
+                    printf("Not a valid cmd, try again.\n");
+                }
                 break;
             case 's':
-                event_schedule(&events, num_inputs[0], num_inputs[1], num_inputs[2]);
+            if(tokens == 4)
+                {
+                    event_schedule(&events, num_inputs[0], num_inputs[1], num_inputs[2]);
+                }
+                else
+                {
+                    printf("Not a valid cmd, try again.\n");
+                }
+                
                 break;
             case 'l':
                 event_count(&events);
@@ -88,8 +115,6 @@ int main(void)
         }    
         
     }
-
-
     
     //free queue at end
     event_queue_free(&events);
@@ -128,7 +153,7 @@ int parse_cmd(const char* line, char inputs[4][5], int nums[3])
             if(token_flag == 1 && letter_len < max_letter_len)
             {
                 letter_len++;
-                letter = *line;
+                *letter = *line;
             } 
             else if(token_flag == 2 && num_len1 < max_num_length)
             {

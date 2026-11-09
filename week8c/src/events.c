@@ -46,14 +46,16 @@ void event_count(const EventQueue *q)
 
 int event_tick(EventQueue *q, EventHandler handler, void *ctx)
 {
+    int amount_of_events_fired = 0;
     Event *prev_event = NULL;
     Event *ptr = q->head;
     while(ptr != NULL)
     {
         if(ptr->ticks_remaining == 0)
         {
-            //fire event here
+            //fire event here and 
             handler(ptr->kind, ptr->arg, ctx);
+            amount_of_events_fired++;
             //free event node//
             //set the pointer to the previous event to point to one after ptr//
             prev_event->next = ptr->next;  
@@ -66,6 +68,7 @@ int event_tick(EventQueue *q, EventHandler handler, void *ctx)
             ptr = ptr->next;
         } 
     }
+    return amount_of_events_fired;
 } 
 
 void event_queue_free(EventQueue *q)
