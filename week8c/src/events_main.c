@@ -7,25 +7,24 @@
 //TODO:
 /*
     currently:
-    ticks increasing functionality needs to be set up
+    ticks increasing functionality needs to be set up [Need to test]
 
     basic onEvent printing is complete. Need to figure out how to get heal pulse
     to schedule multiple events based on the arg
+
+    need to ensure 'q' exits program without issue [DONE]
 
     after:
     run program to look for bugs / other problems
 
 */
 
-
+//context for the event queue
 typedef struct {
     EventQueue *q; 
     int tick;
 } EventsCtx;
 
-
-
-//static void on_event(EventKind kind, int arg, void *ctx);
 int parse_cmd(const char* line, char inputs[4][5], int nums[3]);
 int is_NotEmpty(const char* input);
 static void on_event(EventKind kind, int arg, void *ctx);
@@ -39,15 +38,17 @@ int main(void)
     EventHandler handler = on_event;
 
     //variables for set up
-    int tokens = 0;
+    int quit_flag           = 0;
+    int tokens              = 0;
     char cmd_line[33]       = {0};
     char cmd_inputs[4][5]   = {0};
     int num_inputs[3]       = {0}; //t N //s delay eventkind arg
     
     
-    while(1)
+    while(quit_flag == 0)
     {
-        do //get input within length of the char array, reject until input fits
+        //get input within length of the char array, reject until input fits
+        do 
         {
             printf("Enter command: \n");
             char* input_p = fgets(cmd_line, sizeof(cmd_line), stdin);
@@ -57,7 +58,7 @@ int main(void)
                 {
                     int c;
                     while ((c = getchar()) != '\n' && c != EOF) {};
-                    printf("Your cmd was too long.\n");
+                    printf("Your cmd was too long, try something shorter.\n");
                 }
             }
             else
@@ -69,13 +70,15 @@ int main(void)
 
         cmd_line[strcspn(cmd_line, "\n")] = '\0';
 
+        printf("||DEBUG: INPUT IS WITHIN ACCEPTABLE LENGTH\n");
         //input is within length parameters, now cmd must be parsed
         tokens = parse_cmd(cmd_line, cmd_inputs, num_inputs); //use this to verify input later
 
+        //respond to cmd line
         switch (cmd_inputs[0][0])
         {
             case 't':
-                if(tokens < 2)
+                if(tokens <= 2)
                 {
                     int loop_count = 0;
                     if(tokens == 2)
@@ -86,7 +89,11 @@ int main(void)
                     {
                         loop_count = 1;
                     }
-                    event_tick(&events, handler, &context);
+                    for(int i = 0; i < loop_count; i++)
+                    {
+                        context.tick += 1;
+                        event_tick(&events, handler, &context);
+                    }  
                 }
                 else
                 {
@@ -94,25 +101,26 @@ int main(void)
                 }
                 break;
             case 's':
-            if(tokens == 4)
+                if(tokens == 4)
                 {
                     event_schedule(&events, num_inputs[0], num_inputs[1], num_inputs[2]);
                 }
                 else
                 {
                     printf("Not a valid cmd, try again.\n");
-                }
-                
+                } 
                 break;
             case 'l':
                 event_count(&events);
                 break;
             case 'q':
                 printf("Goodbye\n");
+                quit_flag = 1;
                 break;
             default:
+                printf("Looks like something went wrong...\n");
                 break;
-        }    
+        }
         
     }
     
@@ -124,6 +132,9 @@ int main(void)
 
 int parse_cmd(const char* line, char inputs[4][5], int nums[3])
 {
+    int tokens = 0;
+    if(!is_NotEmpty(line)) return tokens;
+
     int token_flag      = 0;
     int letter_len      = 0;
     int num_len1        = 0;
@@ -137,13 +148,9 @@ int parse_cmd(const char* line, char inputs[4][5], int nums[3])
     char* secondNum = inputs[2];
     char* thirdNum  = inputs[3];
 
-    int tokens = 0;
-
-    if(!is_NotEmpty(line)) return tokens;
-
     while(*line != '\0')
     {
-        if(!isspace(*line))
+        if(!isspace((unsigned char)*line))
         {
             if(token_flag == 0)
             {
@@ -154,6 +161,7 @@ int parse_cmd(const char* line, char inputs[4][5], int nums[3])
             {
                 letter_len++;
                 *letter = *line;
+                letter++;
             } 
             else if(token_flag == 2 && num_len1 < max_num_length)
             {
@@ -187,14 +195,14 @@ int parse_cmd(const char* line, char inputs[4][5], int nums[3])
     *secondNum  = '\0';
     *thirdNum   = '\0';
 
-    if(*letter != '\0') tokens++;
-    if(*firstNum != '\0') tokens++;
-    if(*secondNum != '\0') tokens++;
-    if(*thirdNum != '\0') tokens++;
+    if(inputs[0] != '\0') tokens++;
+    if(inputs[1]!= '\0') tokens++;
+    if(inputs[2] != '\0') tokens++;
+    if(inputs[3] != '\0') tokens++;
 
-    nums[0] = atoi(firstNum);
-    nums[1] = atoi(secondNum);
-    nums[2] = atoi(thirdNum);
+    nums[0] = atoi(inputs[1]);
+    nums[1] = atoi(inputs[2]);
+    nums[2] = atoi(inputs[3]);
 
     return tokens;
 

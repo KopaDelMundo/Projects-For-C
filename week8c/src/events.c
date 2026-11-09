@@ -4,12 +4,15 @@
 
 void event_queue_init(EventQueue *q) //initialize linked list
 {
+    printf("||DEBUG: EVENT_QUEUE_INIT BEGINNING||\n");
     q->head = NULL;
     q->count = 0;
+    printf("||DEBUG: EVENT_QUEUE_INIT DONE||\n");
 }
 
 int event_schedule(EventQueue *q, int delay, EventKind kind, int arg)
 {
+    printf("||DEBUG: EVENT_SCHEDULE BEGINNING||\n");
     Event *temp = malloc(sizeof(Event));
     if(temp == NULL)
     {
@@ -24,12 +27,14 @@ int event_schedule(EventQueue *q, int delay, EventKind kind, int arg)
     temp->next = q->head;
     q->head = temp;
     q->count += 1;
+    printf("||DEBUG: EVENT_SCHEDULE DONE||\n");
     return 1;
 
 } 
 
 void event_count(const EventQueue *q)
 {
+    printf("||DEBUG: EVENT_COUNT BEGINNING||\n");
     Event *temp = q->head;
     if(temp == NULL)
     {
@@ -42,10 +47,12 @@ void event_count(const EventQueue *q)
         printf("Event Kind: %d | Ticks Remaining: %d | Argument: %i |\n", temp->kind, temp->ticks_remaining, temp->arg);
         temp = temp->next;
     }
+    printf("||DEBUG: EVENT_COUNT DONE||\n");
 }
 
 int event_tick(EventQueue *q, EventHandler handler, void *ctx)
 {
+    printf("||DEBUG: EVENT_TICK BEGINNING||\n");
     int amount_of_events_fired = 0;
     Event *prev_event = NULL;
     Event *ptr = q->head;
@@ -68,6 +75,7 @@ int event_tick(EventQueue *q, EventHandler handler, void *ctx)
             ptr = ptr->next;
         } 
     }
+    printf("||DEBUG: EVENT_TICK DONE||\n");
     return amount_of_events_fired;
 } 
 
