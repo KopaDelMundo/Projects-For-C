@@ -13,4 +13,38 @@ How the program should handle input:
         - delay
         - event kind
         - arg 
-    
+
+
+----------------\
+
+1. It always returns 0 tokens and always gives 0 for the numbers (critical)
+While copying characters, you move the letter/firstNum/... pointers forward, so after the loop each one points at the end of what it wrote. Then you write '\0' there and check whether that same spot is not '\0'. That check can never be true, so tokens is always 0. atoi also reads from those end pointers, so it always sees an empty string and returns 0.
+
+What it breaks: s is always rejected ("Not a valid cmd"), and t 3 ticks only once. tokens <= 2 happens to be true for 0, so t looks like it works, which hid the bug.
+
+Principle: if you walk a pointer through a buffer, keep the original start pointer separately. Once the walk is done, the cursor no longer means "the string".
+
+2. An empty line repeats the previous command
+For a blank or all-whitespace line, is_NotEmpty makes parse_cmd return early without touching inputs or nums. cmd_inputs[0][0] still holds the last command letter, so the switch runs it again. In my run, pressing Enter after t ticked again.
+
+Principle: out-parameters should always end up in a defined state, including on early-return paths.
+
+3. Each extra space counts as a new token
+token_flag goes up on every whitespace character, not on the change from a word to a space. So t  5 (two spaces) puts the 5 into the second number slot, and a tab plus a space counts as two separators. It's the same family as your boundary-expression habit: you're counting characters when you mean to count transitions.
+
+4. Bad input is accepted without any warning
+Words that are too long get cut short: spawn is treated as s, and 12345 becomes 1234.
+Anything after the fourth word is dropped.
+atoi can't tell you something failed: t abc and t 0 both give 0. t -5 is accepted and the loop just runs zero times.
+Nothing checks that the event-kind number is in range before it's passed in as an EventKind.
+The comment "use this to verify input later" suggests you know this. The parser has the most information about what went wrong, so this is the place to reject bad input. strtol with its end pointer is the standard tool for numbers.
+
+5. Inconsistent isspace calls (recurring pattern #4)
+is_NotEmpty correctly casts to unsigned char before calling isspace, but parse_cmd doesn't. Passing a negative char (any non-ASCII byte) to isspace is undefined behavior. You clearly knew the rule because you applied it in one function. It just didn't get carried over to the one beside it.
+
+6. Limits are duplicated outside the array sizes (recurring pattern #1)
+max_letter_len = 1 and max_num_length = 4 restate what the [4][5] and [3] in the signature already define. If you change one, the others silently drift out of sync. The repeated num_len1/2/3 and firstNum/secondNum/thirdNum branches are the same issue at a larger scale. Indexing by token number would collapse four branches into one, and fewer copies means fewer places for bug #1 to hide.
+
+Not part of parse_cmd, but it showed up in the same run: l on an empty queue prints "Allocation failed" from event_count, which is the wrong message for that case.
+
+Fixing #1 will make s work for the first time, so expect new behavior in event_schedule once it actually receives arguments.
