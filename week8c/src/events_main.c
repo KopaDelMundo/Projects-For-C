@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include "events.h"
 
+#define CMD_MAX 18
+#define MAX_TOKENS 4
+#define MAX_LEN 5
+
 //TODO:
 /*
     currently:
@@ -38,11 +42,12 @@ int main(void)
     EventHandler handler = on_event;
 
     //variables for set up
-    int quit_flag           = 0;
-    int tokens              = 0;
-    char cmd_line[33]       = {0};
-    char cmd_inputs[4][5]   = {0};
-    int num_inputs[3]       = {0}; //t N //s delay eventkind arg
+    int quit_flag                           = 0;
+    int tokens                              = 0;
+    char cmd_line[CMD_MAX]                  = {0};
+    char cmd_tokens[MAX_TOKENS][MAX_LEN]    = {0};
+    int num_inputs[3]                       = {0}; 
+    //t N //s delay eventkind arg
     
     
     while(quit_flag == 0)
@@ -72,10 +77,10 @@ int main(void)
 
         printf("||DEBUG: INPUT IS WITHIN ACCEPTABLE LENGTH\n");
         //input is within length parameters, now cmd must be parsed
-        tokens = parse_cmd(cmd_line, cmd_inputs, num_inputs); //use this to verify input later
+        tokens = parse_cmd(cmd_line, cmd_tokens, num_inputs); //use this to verify input later
 
         //respond to cmd line
-        switch (cmd_inputs[0][0])
+        switch (cmd_tokens[0][0])
         {
             case 't':
                 if(tokens <= 2)
@@ -135,74 +140,7 @@ int parse_cmd(const char* line, char inputs[4][5], int nums[3])
     int tokens = 0;
     if(!is_NotEmpty(line)) return tokens;
 
-    int token_flag      = 0;
-    int letter_len      = 0;
-    int num_len1        = 0;
-    int num_len2        = 0;
-    int num_len3        = 0;
-    int max_letter_len  = 1;
-    int max_num_length  = 4;
-
-    char* letter    = inputs[0];
-    char* firstNum  = inputs[1];
-    char* secondNum = inputs[2];
-    char* thirdNum  = inputs[3];
-
-    while(*line != '\0')
-    {
-        if(!isspace((unsigned char)*line))
-        {
-            if(token_flag == 0)
-            {
-                token_flag = 1;
-            }
-
-            if(token_flag == 1 && letter_len < max_letter_len)
-            {
-                letter_len++;
-                *letter = *line;
-                letter++;
-            } 
-            else if(token_flag == 2 && num_len1 < max_num_length)
-            {
-                num_len1++;
-                *firstNum = *line;
-                firstNum++;
-            }
-            else if(token_flag == 3 && num_len2 < max_num_length)
-            {
-                num_len2++;
-                *secondNum = *line;
-                secondNum++;
-            }
-            else if(token_flag == 4 && num_len3 < max_num_length)
-            {
-                num_len3++;
-                *thirdNum = *line;
-                thirdNum++;
-            }
-        }
-        else if(isspace(*line) && token_flag > 0)
-        {
-            token_flag++;
-        }
-
-        line++;
-    }
-
-    *letter     = '\0';
-    *firstNum   = '\0';
-    *secondNum  = '\0';
-    *thirdNum   = '\0';
-
-    if(inputs[0] != '\0') tokens++;
-    if(inputs[1]!= '\0') tokens++;
-    if(inputs[2] != '\0') tokens++;
-    if(inputs[3] != '\0') tokens++;
-
-    nums[0] = atoi(inputs[1]);
-    nums[1] = atoi(inputs[2]);
-    nums[2] = atoi(inputs[3]);
+   
 
     return tokens;
 
