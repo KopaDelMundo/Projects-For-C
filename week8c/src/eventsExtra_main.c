@@ -8,6 +8,12 @@
 #define TOK_BUFSIZE 64
 #define TOK_DELIM " \t\r\n\a"
 
+typedef enum {
+    EMPTY_CMD,
+    INVALID_CMD,
+    QUIT
+} result_status;
+
 //context for event queue
 typedef struct {
     EventQueue *q;
@@ -26,15 +32,15 @@ char *builtin_str[] = {
 char *read_line(void);
 char **split_line(char *line);
 int run_cmd(char **args);
-int lsh_num_builtins() 
+int num_builtins(void) 
 {
   return sizeof(builtin_str) / sizeof(char *);
 }
 //commands
-int t(char** args);
-int s(char** args);
-int l(char** args);
-int q(char** args);
+void t(char** args, EventQueue *events, EventHandler handler, EventsCtx *context)
+void s(char** args);
+void l(const EventQueue *q);
+int q(void);
 //game logic
 static void on_event(EventKind kind, int arg, void *ctx);
 
@@ -64,9 +70,14 @@ int main(void)
         args = split_line(line);
         status = run_cmd(args);
 
+        if(status == INVALID_CMD)
+        {
+            printf("Command not valid. Please try again.\n");
+        }
+
         free(line);
         free(args);
-    }while(status);
+    }while(status != QUIT);
 
 }
 
@@ -107,7 +118,7 @@ char *read_line(void)
             buffer = realloc(buffer, bufsize);
             if(!buffer)
             {
-                fprintf(stderr, "lsh: allocation error\n");
+                fprintf(stderr, "allocation error\n");
                 exit(EXIT_FAILURE);
             }
         }
@@ -155,8 +166,54 @@ int rum_cmd(char **args)
     if (args[0] == NULL)
     {
         //an empty cmd has been entered
-        return 1;
+        return EMPTY_CMD;
     } 
 
-    for(int i = 0; i <  +3)
+    for(int i = 0; i < num_builtins(); i++)
+    {
+        if(strcmp(args[0], builtin_str[i]) == 0)
+        {
+            return (*builtin_func[i])(args);
+        }
+    }
+
+    return INVALID_CMD;
+}
+
+int t(char** args, EventQueue *events, EventHandler handler, EventsCtx *context)
+{
+    int n = 0;
+    if (args[1] == NULL)
+    {
+        n = 1;
+    }
+    else
+    {
+        n = args[1];
+    }
+    for (int i = 0; i < n; i ++)
+    {
+        context->tick += 1;
+        event_tick(&events, handler, &context);
+    }
+}
+void s(char** args);
+
+void l(const EventQueue *q)
+{
+    event_count(q);
+}
+
+int q(void);
+{
+    printf("Ending program\n");
+    return QUIT;
+}
+
+static void on_event(EventKind kind, int arg, void *ctx)
+{
+    EventsCtx *c = ctx;
+
+
+
 }
