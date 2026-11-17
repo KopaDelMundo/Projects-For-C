@@ -71,6 +71,7 @@ int event_tick(EventQueue *q, EventHandler handler, void *ctx)
         }
         else
         {
+            ptr->ticks_remaining--;
             prev_event = ptr;
             ptr = ptr->next;
         } 

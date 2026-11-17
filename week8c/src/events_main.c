@@ -4,145 +4,158 @@
 #include <stdlib.h>
 #include "events.h"
 
-#define CMD_MAX 18
-#define MAX_TOKENS 4
-#define MAX_LEN 5
+#define TOK_BUFSIZE 64
+#define TOK_DELIM " \t\r\n\a"
 
-//TODO:
-/*
-    currently:
-    ticks increasing functionality needs to be set up [Need to test]
-
-    basic onEvent printing is complete. Need to figure out how to get heal pulse
-    to schedule multiple events based on the arg
-
-    need to ensure 'q' exits program without issue [DONE]
-
-    after:
-    run program to look for bugs / other problems
-
-*/
-
-//context for the event queue
 typedef struct {
-    EventQueue *q; 
+    EventQueue *q;
     int tick;
 } EventsCtx;
 
-int parse_cmd(const char* line, char inputs[4][5], int nums[3]);
-int is_NotEmpty(const char* input);
+char* get_input_from_user(void);
+char **split_line(char *line);
+void run_cmd(char** args, EventQueue *q, EventHandler h, EventsCtx *ctx);
 static void on_event(EventKind kind, int arg, void *ctx);
+
 
 int main(void)
 {
-    //create event queue and context for ticks/events
+    //create event queue + context that wraps around it to track ticks and event handler assignment
     EventQueue events;
     event_queue_init(&events);
-    EventsCtx context = { &events, 0 };
-    EventHandler handler = on_event;
-
-    //variables for set up
-    int quit_flag                           = 0;
-    int tokens                              = 0;
-    char cmd_line[CMD_MAX]                  = {0};
-    char cmd_tokens[MAX_TOKENS][MAX_LEN]    = {0};
-    int num_inputs[3]                       = {0}; 
-    //t N //s delay eventkind arg
+    EventsCtx ctx = { &events, 0 };
+    EventHandler handler = &on_event;
+    char *line = NULL;
+    char **args;
+    //int status;
     
-    
-    while(quit_flag == 0)
+    while(1)
     {
-        //get input within length of the char array, reject until input fits
-        do 
-        {
-            printf("Enter command: \n");
-            char* input_p = fgets(cmd_line, sizeof(cmd_line), stdin);
-            if(input_p != NULL)
-            {
-                if(strchr(cmd_line, '\n') == NULL)
-                {
-                    int c;
-                    while ((c = getchar()) != '\n' && c != EOF) {};
-                    printf("Your cmd was too long, try something shorter.\n");
-                }
-            }
-            else
-            {
-                printf("Input Ended.\n");
-                return 0;
-            }
-        } while (strchr(cmd_line, '\n') == NULL);
-
-        cmd_line[strcspn(cmd_line, "\n")] = '\0';
-
-        printf("||DEBUG: INPUT IS WITHIN ACCEPTABLE LENGTH\n");
-        //input is within length parameters, now cmd must be parsed
-        tokens = parse_cmd(cmd_line, cmd_tokens, num_inputs); //use this to verify input later
-
-        //respond to cmd line
-        switch (cmd_tokens[0][0])
-        {
-            case 't':
-                if(tokens <= 2)
-                {
-                    int loop_count = 0;
-                    if(tokens == 2)
-                    {
-                        loop_count = num_inputs[0];
-                    }
-                    else
-                    {
-                        loop_count = 1;
-                    }
-                    for(int i = 0; i < loop_count; i++)
-                    {
-                        context.tick += 1;
-                        event_tick(&events, handler, &context);
-                    }  
-                }
-                else
-                {
-                    printf("Not a valid cmd, try again.\n");
-                }
-                break;
-            case 's':
-                if(tokens == 4)
-                {
-                    event_schedule(&events, num_inputs[0], num_inputs[1], num_inputs[2]);
-                }
-                else
-                {
-                    printf("Not a valid cmd, try again.\n");
-                } 
-                break;
-            case 'l':
-                event_count(&events);
-                break;
-            case 'q':
-                printf("Goodbye\n");
-                quit_flag = 1;
-                break;
-            default:
-                printf("Looks like something went wrong...\n");
-                break;
-        }
-        
-    }
     
-    //free queue at end
-    event_queue_free(&events);
-  
+        line = get_input_from_user();
+        args = split_line(line);
+        run_cmd(args, &events, handler, &ctx);
+
+
+
+        free(line);
+        free(args);
+    }
+
+    
+}
+
+char* get_input_from_user(void)
+{
+    char* line = NULL;
+    size_t bufsize = 0;
+    ssize_t nread = 0;
+
+    do
+    {
+        printf("Enter Command: \n");
+        nread = getline(&line, &bufsize, stdin);
+
+        if(nread == -1)
+        {
+            free(line);
+            return NULL;
+        }
+
+    } while (nread <= 1); 
+    
+    return line;  
+}
+
+char **split_line(char *line)
+{
+    int bufsize = TOK_BUFSIZE;
+    int position = 0;
+    char **tokens = malloc(sizeof(char) *bufsize);
+    char *token;
+
+    if(!tokens) 
+    {
+        printf("split_line: It's broken (on malloc)!\n");
+        return NULL;
+    }
+
+    token = strtok(line, TOK_DELIM);
+    while (token != NULL)
+    {
+        tokens[position] = token;
+        position++;
+
+        if(position >= bufsize)
+        {
+            bufsize += TOK_BUFSIZE;
+            tokens = realloc(tokens, bufsize * sizeof(char*));
+            if(!tokens) 
+            {
+                printf("split_line: It's broken (on realloc)!\n");
+                return NULL;
+            }
+        }
+        token = strtok(NULL, TOK_DELIM);
+    }
+
+    tokens[position] = NULL;
+    return tokens;
 
 }
 
-int parse_cmd(const char* line, char inputs[4][5], int nums[3])
+void run_cmd(char** args, EventQueue *q, EventHandler h, EventsCtx *ctx)
 {
-    int tokens = 0;
-    if(!is_NotEmpty(line)) return tokens;
 
-   
+    char *endptr;
 
-    return tokens;
+    if(args[0] == NULL)
+    {
+        printf("empty cmd, try again\n");
+
+    }
+
+    switch(args[0][0])
+    {
+        case 't':;
+            int n = 0;
+            if (args[1] == NULL)
+            {
+                n = 0;
+            }
+            else
+            {
+                n = (int)strtol(args[1], &endptr, 10);
+            }
+                for(int i = 0; i < n; i++)
+                {
+                    ctx->tick += 1;
+                    event_tick(q, h, ctx);
+                }
+            break;
+        case 's':
+            if (args[1] == NULL || args[2] == NULL || args[3] == NULL)
+            {
+                printf("Missing arguments\n");
+            }
+            else
+            {
+                int delay = (int)strtol(args[1], &endptr, 10);
+                int kind = (int)strtol(args[2], &endptr, 10);
+                int arg = (int)strtol(args[2], &endptr, 10);
+                event_schedule(q, delay, kind, arg);
+            }
+            break;
+        case 'l':
+            event_count(q);
+            break;
+        case 'q':
+            printf("Goodbye\n");
+            exit(EXIT_SUCCESS);
+            break;
+        default:
+            printf("Error, args[0][0] doesn't match any letters!\n");
+    }
 
 }
 
@@ -164,26 +177,4 @@ static void on_event(EventKind kind, int arg, void *ctx)
         default:
             printf("?\n");  
     }
-}
-
-int is_NotEmpty(const char* input) 
-{
-    if(input == NULL) return 0;
-
-    while(*input != '\0')
-    {
-        if(!isspace((unsigned char)*input))
-        {
-            break;
-        }
-
-        input++;
-    }
-
-    if(*input == '\0')
-    {
-        return 0;
-    }
-  
-    return 1;
 }

@@ -12,22 +12,11 @@ typedef struct {
     int tick;
 } EventsCtx;
 
-char *builtin_str[] = {
-    "t",
-    "s",
-    "l",
-    "q"
-};
-
-int num_builtins(void) 
-{
-  return sizeof(builtin_str) / sizeof(char *);
-}
-
 char* get_input_from_user(void);
 char **split_line(char *line);
-int rum_cmd(char** args);
+int run_cmd(char** args, EventQueue *q, EventHandler h, EventsCtx *ctx);
 static void on_event(EventKind kind, int arg, void *ctx);
+
 
 int main(void)
 {
@@ -38,16 +27,16 @@ int main(void)
     EventHandler handler = on_event;
     char *line = NULL;
     char **args;
+    int status;
     
     while(1)
     {
     
         line = get_input_from_user();
         args = split_line(line);
+        status = run_cmd(args, &events, handler, &ctx);
 
-        //get input
-        //tokenize
-        //select logic based off of token
+
 
         free(line);
         free(args);
@@ -115,23 +104,76 @@ char **split_line(char *line)
 
 }
 
-
-
-int rum_cmd(char** args)
+int run_cmd(char** args, EventQueue *q, EventHandler h, EventsCtx *ctx)
 {
+
+    char *endptr;
+
     if(args[0] == NULL)
     {
-        printf("emty cmd, try again\n");
+        printf("empty cmd, try again\n");
     }
 
-    for (int i = 0; i < num_builtins; i++)
+    switch(args[0][0])
     {
-        if(strcmp(args[0], builtin_str[i]) == 0)
-        {
-            return (*builtin_func[i](args));
-        }
-        
+        case 't':
+            int n = 0;
+            if (args[1] == NULL)
+            {
+                n = 0;
+            }
+            else
+            {
+                n = (int)strtol(args[1], &endptr, 10);
+            }
+                for(int i = 0; i < n; i++)
+                {
+                    ctx->tick += 1;
+                    event_tick(q, h, ctx);
+                }
+            break;
+        case 's':
+            if (args[1] == NULL || args[2] == NULL || args[3] == NULL)
+            {
+                printf("Missing arguments\n");
+            }
+            else
+            {
+                int delay = (int)strtol(args[1], &endptr, 10);
+                int kind = (int)strtol(args[2], &endptr, 10);
+                int arg = (int)strtol(args[2], &endptr, 10);
+                event_schedule(q, delay, kind, arg);
+            }
+            break;
+        case 'l':
+            event_count(q);
+            break;
+        case 'q':
+            printf("Goodbye\n");
+            break;
+        default:
+            printf("Error, args[0][0] doesn't match any letters!\n");
     }
 
     return 404;
+}
+
+static void on_event(EventKind kind, int arg, void *ctx)
+{
+    EventsCtx *c = ctx;
+
+    switch(kind)
+    {
+        case EVENT_SPAWN_WAVE:
+            printf("Tick %d: SPAWN_WAVE(%d)\n", c->tick, arg);
+            break;
+        case EVENT_HEAL_PULSE:
+            printf("Tick %d: HEAL_PULSE(%d)\n", c->tick, arg);
+            break;
+        case EVENT_MESSAGE:
+            printf("Tick %d: MESSAGE(%d)\n", c->tick, arg);
+            break;
+        default:
+            printf("?\n");  
+    }
 }
